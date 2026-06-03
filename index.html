@@ -2490,6 +2490,7 @@ function updateVisitorCount() {
   const site = 'weddingplan01.github.io';
   const path = '/';
   fetch('https://page-views-api.ratneshc.com/api/v1/track?site=' + site + '&path=' + path, { cache: 'no-store' })
+    .then(() => fetch('https://page-views-api.ratneshc.com/api/v1/views?site=' + site + '&path=' + path, { cache: 'no-store' }))
     .then(r => r.json())
     .then(d => {
       document.getElementById('visitorCount').textContent = d.views.toLocaleString();
