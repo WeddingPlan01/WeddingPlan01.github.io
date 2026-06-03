@@ -2487,25 +2487,15 @@ renderNotes();
 
 // Visitor Counter
 function updateVisitorCount() {
-  const key = 'visit_' + btoa(location.origin + location.pathname).replace(/=/g, '');
-  let count = localStorage.getItem(key);
-  if (count) {
-    document.getElementById('visitorCount').textContent = (+count).toLocaleString();
-  } else {
-    count = 1;
-    localStorage.setItem(key, '1');
-    document.getElementById('visitorCount').textContent = '1';
-  }
-  fetch('https://api.visitorbadge.io/api/visitors?path=' + encodeURIComponent(location.origin + location.pathname) + '&label=Visitors&countColor=%23d4af3700&labelStyle=none', { cache: 'no-store' })
+  const site = 'weddingplan01.github.io';
+  const path = '/';
+  fetch('https://page-views-api.ratneshc.com/api/v1/track?site=' + site + '&path=' + path, { cache: 'no-store' })
     .then(r => r.json())
     .then(d => {
-      const v = d.count || d.value || 0;
-      document.getElementById('visitorCount').textContent = Number(v).toLocaleString();
-      localStorage.setItem(key, String(v));
+      document.getElementById('visitorCount').textContent = d.views.toLocaleString();
     })
     .catch(() => {
-      const fallback = +localStorage.getItem(key) || 0;
-      document.getElementById('visitorCount').textContent = fallback.toLocaleString();
+      document.getElementById('visitorCount').textContent = '—';
     });
 }
 updateVisitorCount();
