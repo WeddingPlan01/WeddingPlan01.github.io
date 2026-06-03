@@ -2487,10 +2487,26 @@ renderNotes();
 
 // Visitor Counter
 function updateVisitorCount() {
-  fetch('https://api.countapi.xyz/hit/miswanto.github.io/weddingplan01', { cache: 'no-store' })
+  const key = 'visit_' + btoa(location.origin + location.pathname).replace(/=/g, '');
+  let count = localStorage.getItem(key);
+  if (count) {
+    document.getElementById('visitorCount').textContent = (+count).toLocaleString();
+  } else {
+    count = 1;
+    localStorage.setItem(key, '1');
+    document.getElementById('visitorCount').textContent = '1';
+  }
+  fetch('https://api.visitorbadge.io/api/visitors?path=' + encodeURIComponent(location.origin + location.pathname) + '&label=Visitors&countColor=%23d4af3700&labelStyle=none', { cache: 'no-store' })
     .then(r => r.json())
-    .then(d => { document.getElementById('visitorCount').textContent = d.value.toLocaleString(); })
-    .catch(() => { document.getElementById('visitorCount').textContent = '—'; });
+    .then(d => {
+      const v = d.count || d.value || 0;
+      document.getElementById('visitorCount').textContent = Number(v).toLocaleString();
+      localStorage.setItem(key, String(v));
+    })
+    .catch(() => {
+      const fallback = +localStorage.getItem(key) || 0;
+      document.getElementById('visitorCount').textContent = fallback.toLocaleString();
+    });
 }
 updateVisitorCount();
 
