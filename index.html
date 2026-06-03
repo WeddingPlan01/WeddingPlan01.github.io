@@ -1,0 +1,2484 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Our Wedding Plan</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js">
+</script>
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --blush: #f8e8e0;
+  --blush-dark: #f0d5c8;
+  --gold: #c9a96e;
+  --gold-light: #e8d5a8;
+  --gold-dark: #a8884a;
+  --cream: #fdf8f5;
+  --sage: #b5c4b1;
+  --sage-dark: #8a9e85;
+  --charcoal: #4a4545;
+  --text: #5a5555;
+  --text-light: #8a8585;
+  --white: #ffffff;
+  --shadow: 0 4px 30px rgba(0,0,0,0.06);
+  --shadow-hover: 0 8px 40px rgba(0,0,0,0.10);
+  --radius: 16px;
+  --radius-sm: 10px;
+}
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--cream);
+  color: var(--text);
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+h1, h2, h3, h4 { font-family: 'Playfair Display', serif; color: var(--charcoal); font-weight: 600; }
+.script { font-family: 'Cormorant Garamond', serif; font-style: italic; }
+
+/* Floating decoration */
+.floral-bg {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+.floral-bg span {
+  position: absolute;
+  border-radius: 50%;
+  opacity: 0.08;
+}
+.floral-bg span:nth-child(1) { width: 400px; height: 400px; background: var(--gold); top: -100px; right: -100px; }
+.floral-bg span:nth-child(2) { width: 300px; height: 300px; background: var(--blush); bottom: -50px; left: -80px; }
+.floral-bg span:nth-child(3) { width: 200px; height: 200px; background: var(--sage); top: 40%; right: 5%; }
+.floral-bg span:nth-child(4) { width: 150px; height: 150px; background: var(--gold-light); top: 20%; left: 3%; }
+
+/* Nav */
+nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 1000;
+  padding: 14px 40px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: all 0.4s ease;
+  background: transparent;
+}
+nav.scrolled {
+  background: rgba(253,248,245,0.94);
+  backdrop-filter: blur(20px);
+  box-shadow: 0 1px 20px rgba(0,0,0,0.06);
+  padding: 10px 40px;
+}
+.nav-logo { font-family: 'Playfair Display', serif; font-size: 22px; color: var(--charcoal); white-space: nowrap; }
+.nav-logo span { color: var(--gold); }
+.nav-links { display: flex; gap: 6px; list-style: none; align-items: center; }
+.nav-links > li { position: relative; }
+.nav-links a {
+  text-decoration: none;
+  color: var(--text-light);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+  transition: color 0.3s;
+  padding: 6px 12px;
+  border-radius: 8px;
+  white-space: nowrap;
+}
+.nav-links a:hover { color: var(--gold); background: rgba(201,169,110,0.06); }
+.nav-links .nav-btn {
+  background: var(--gold);
+  color: white !important;
+  padding: 6px 18px;
+  border-radius: 50px;
+}
+.nav-links .nav-btn:hover { background: var(--gold-dark); }
+
+/* Dropdown */
+.dropdown-content {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--white);
+  border-radius: var(--radius-sm);
+  box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+  padding: 6px;
+  min-width: 200px;
+  z-index: 100;
+}
+.dropdown-content a {
+  display: block;
+  padding: 8px 14px;
+  border-radius: 6px;
+  font-size: 12px;
+}
+.dropdown:hover .dropdown-content { display: block; }
+
+/* Hamburger */
+.hamburger {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 4px;
+}
+.hamburger span {
+  display: block;
+  width: 24px;
+  height: 2px;
+  background: var(--charcoal);
+  border-radius: 2px;
+  transition: all 0.3s;
+}
+.hamburger.active span:nth-child(1) { transform: rotate(45deg) translate(5px,5px); }
+.hamburger.active span:nth-child(2) { opacity: 0; }
+.hamburger.active span:nth-child(3) { transform: rotate(-45deg) translate(5px,-5px); }
+
+/* Hero */
+.hero {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 120px 20px 60px;
+  position: relative;
+  z-index: 1;
+}
+.hero-badge {
+  display: inline-block;
+  padding: 8px 24px;
+  border: 1px solid var(--gold);
+  border-radius: 50px;
+  font-size: 12px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 24px;
+  font-weight: 500;
+}
+.hero h1 {
+  font-size: clamp(48px, 10vw, 96px);
+  font-weight: 600;
+  line-height: 1.1;
+  margin-bottom: 12px;
+}
+.hero h1 .ampersand { font-family: 'Cormorant Garamond', serif; font-style: italic; color: var(--gold); font-weight: 400; }
+.hero .subtitle {
+  font-size: 18px;
+  color: var(--text-light);
+  margin-bottom: 40px;
+  font-weight: 300;
+}
+.hero-date {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 16px 36px;
+  background: var(--white);
+  border-radius: 60px;
+  box-shadow: var(--shadow);
+}
+.hero-date .date-item { text-align: center; }
+.hero-date .date-item .num { display: block; font-family: 'Playfair Display', serif; font-size: 28px; color: var(--charcoal); line-height: 1; }
+.hero-date .date-item .lbl { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-light); }
+.hero-date .separator { font-size: 24px; color: var(--gold); font-family: 'Cormorant Garamond', serif; }
+
+.scroll-indicator { margin-top: 48px; animation: bounce 2s infinite; }
+.scroll-indicator svg { width: 24px; height: 24px; color: var(--gold); }
+@keyframes bounce { 0%,100% { transform: translateY(0); } 50% { transform: translateY(8px); } }
+
+.section { padding: 80px 20px; position: relative; z-index: 1; }
+.section-inner { max-width: 1100px; margin: 0 auto; }
+.section-label {
+  font-size: 12px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--gold);
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+.section-title { font-size: clamp(32px, 5vw, 48px); margin-bottom: 12px; }
+.section-desc {
+  color: var(--text-light);
+  font-size: 16px;
+  margin-bottom: 48px;
+  font-weight: 300;
+  max-width: 500px;
+}
+
+/* Cards */
+.card {
+  background: var(--white);
+  border-radius: var(--radius);
+  padding: 32px;
+  box-shadow: var(--shadow);
+  transition: all 0.3s;
+  margin-bottom: 24px;
+}
+.card:hover { box-shadow: var(--shadow-hover); }
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.card-header h3 { font-size: 20px; }
+.card-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+/* Checklist Grid */
+.checklist-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+@media (max-width: 800px) { .checklist-grid { grid-template-columns: 1fr; } }
+
+.mini-card {
+  background: var(--white);
+  border-radius: var(--radius);
+  padding: 24px;
+  box-shadow: var(--shadow);
+  transition: all 0.3s;
+}
+.mini-card:hover { box-shadow: var(--shadow-hover); }
+.mini-card .mc-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+  gap: 10px;
+}
+.mini-card .mc-header h4 {
+  font-size: 16px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.mini-card .mc-header h4 .mc-icon { font-size: 18px; }
+.mini-card .mc-progress {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--text-light);
+}
+.mini-card .mc-progress .bar {
+  width: 60px;
+  height: 4px;
+  background: #f0ebe6;
+  border-radius: 4px;
+  overflow: hidden;
+}
+.mini-card .mc-progress .bar .fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--gold-light), var(--gold));
+  border-radius: 4px;
+  transition: width 0.4s;
+}
+
+/* Form */
+.form-group { margin-bottom: 18px; }
+.form-group label {
+  display: block;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-light);
+  margin-bottom: 6px;
+  letter-spacing: 0.3px;
+}
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+@media (max-width: 600px) { .form-row { grid-template-columns: 1fr; } }
+input, select, textarea {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1.5px solid #ece4de;
+  border-radius: var(--radius-sm);
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  color: var(--text);
+  background: var(--cream);
+  transition: all 0.3s;
+  outline: none;
+}
+input:focus, select:focus, textarea:focus {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px rgba(201,169,110,0.1);
+  background: var(--white);
+}
+textarea { resize: vertical; min-height: 80px; }
+input[type="number"] { -moz-appearance: textfield; }
+
+/* Buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 28px;
+  border: none;
+  border-radius: 50px;
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+  cursor: pointer;
+  transition: all 0.3s;
+  text-decoration: none;
+}
+.btn-primary { background: var(--gold); color: var(--white); }
+.btn-primary:hover { background: var(--gold-dark); transform: translateY(-1px); box-shadow: 0 4px 15px rgba(201,169,110,0.3); }
+.btn-secondary { background: transparent; color: var(--text-light); border: 1.5px solid #ece4de; }
+.btn-secondary:hover { border-color: var(--gold); color: var(--gold); }
+.btn-danger { background: #f5e6e6; color: #b56a6a; }
+.btn-danger:hover { background: #ecc; color: #a05555; }
+.btn-success { background: #e0ede0; color: #558855; }
+.btn-success:hover { background: #cde0cd; }
+.btn-sm { padding: 7px 14px; font-size: 11px; }
+.btn-xs { padding: 4px 10px; font-size: 10px; border-radius: 30px; }
+.btn-gold-outline { border: 1.5px solid var(--gold); color: var(--gold); background: transparent; }
+.btn-gold-outline:hover { background: var(--gold); color: white; }
+
+/* List item */
+.list-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 0;
+  border-bottom: 1px solid #f0ebe6;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.list-item:last-child { border-bottom: none; }
+.list-item .info { flex: 1; min-width: 100px; }
+.list-item .info .name { font-weight: 500; color: var(--charcoal); font-size: 14px; }
+.list-item .info .detail { font-size: 12px; color: var(--text-light); }
+.list-item .actions { display: flex; gap: 4px; flex-shrink: 0; }
+
+/* Badge */
+.badge {
+  display: inline-block;
+  padding: 3px 12px;
+  border-radius: 50px;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.2px;
+}
+.badge-gold { background: var(--gold-light); color: var(--gold-dark); }
+.badge-sage { background: #e4ede2; color: var(--sage-dark); }
+.badge-blush { background: var(--blush); color: #c49a8a; }
+.badge-rose { background: #fadbd8; color: #b85c5c; }
+
+/* Progress */
+.progress-bar {
+  height: 6px;
+  background: #f0ebe6;
+  border-radius: 10px;
+  overflow: hidden;
+  margin: 8px 0;
+}
+.progress-bar .fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--gold-light), var(--gold));
+  border-radius: 10px;
+  transition: width 0.5s ease;
+}
+
+/* Checkbox */
+.check-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid #f0ebe6;
+  cursor: pointer;
+  transition: opacity 0.3s;
+}
+.check-item:last-child { border-bottom: none; }
+.check-item.done .check-label { text-decoration: line-through; color: var(--text-light); }
+.check-box {
+  width: 20px;
+  height: 20px;
+  border: 2px solid #d4ccc6;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.3s;
+}
+.check-item.done .check-box { background: var(--gold); border-color: var(--gold); }
+.check-box svg { width: 11px; height: 11px; color: white; opacity: 0; transition: opacity 0.3s; }
+.check-item.done .check-box svg { opacity: 1; }
+.check-label { flex: 1; font-size: 13px; }
+.check-label .check-extra { font-size: 11px; color: var(--text-light); margin-left: 6px; }
+
+/* Stats grid */
+.stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 14px; margin-bottom: 28px; }
+.stat-card {
+  background: var(--white);
+  border-radius: var(--radius);
+  padding: 22px;
+  text-align: center;
+  box-shadow: var(--shadow);
+  transition: all 0.3s;
+}
+.stat-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-hover); }
+.stat-card .num { font-family: 'Playfair Display', serif; font-size: 30px; color: var(--gold); }
+.stat-card .lbl { font-size: 11px; color: var(--text-light); letter-spacing: 0.5px; margin-top: 4px; }
+
+/* Notes grid */
+.notes-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; }
+.note-card {
+  background: linear-gradient(135deg, #fdf8f5 0%, #f8f0ec 100%);
+  border-radius: var(--radius-sm);
+  padding: 20px;
+  border-left: 3px solid var(--gold);
+  position: relative;
+  transition: all 0.3s;
+}
+.note-card:hover { box-shadow: var(--shadow); }
+.note-card .del {
+  position: absolute;
+  top: 10px; right: 12px;
+  background: none; border: none;
+  color: var(--text-light);
+  cursor: pointer;
+  font-size: 16px;
+  opacity: 0.5;
+  transition: opacity 0.3s;
+}
+.note-card .del:hover { opacity: 1; color: #b56a6a; }
+.note-card p { font-size: 14px; color: var(--text); }
+.note-card .date { font-size: 11px; color: var(--text-light); margin-top: 8px; }
+
+/* Toast */
+.toast {
+  position: fixed;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%) translateY(80px);
+  background: var(--charcoal);
+  color: var(--white);
+  padding: 14px 32px;
+  border-radius: 50px;
+  font-size: 13px;
+  font-weight: 500;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+  opacity: 0;
+  transition: all 0.4s ease;
+  z-index: 9999;
+  pointer-events: none;
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* Couple */
+.couple-display {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 40px;
+  padding: 32px 0;
+  flex-wrap: wrap;
+}
+.couple-card { text-align: center; }
+.couple-card .initial {
+  width: 80px; height: 80px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Playfair Display', serif;
+  font-size: 32px;
+  margin: 0 auto 12px;
+  color: white;
+}
+.couple-card .initial.groom { background: linear-gradient(135deg, var(--sage-dark), var(--sage)); }
+.couple-card .initial.bride { background: linear-gradient(135deg, var(--gold), var(--gold-light)); }
+.couple-card .name { font-family: 'Playfair Display', serif; font-size: 22px; color: var(--charcoal); }
+.couple-card .role { font-size: 12px; color: var(--text-light); letter-spacing: 1px; text-transform: uppercase; }
+.couple-heart { font-size: 36px; color: var(--gold); font-family: 'Cormorant Garamond', serif; }
+
+/* Countdown */
+.countdown { display: flex; gap: 24px; justify-content: center; flex-wrap: wrap; margin: 24px 0; }
+.countdown-item { text-align: center; min-width: 70px; }
+.countdown-item .num { display: block; font-family: 'Playfair Display', serif; font-size: 36px; color: var(--charcoal); line-height: 1; }
+.countdown-item .lbl { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-light); margin-top: 4px; }
+
+/* Event info */
+.event-info { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+@media (max-width: 600px) { .event-info { grid-template-columns: 1fr; } }
+.event-info-item { display: flex; align-items: start; gap: 14px; padding: 16px; background: var(--cream); border-radius: var(--radius-sm); }
+.event-info-item .icon { font-size: 20px; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; background: var(--white); border-radius: 10px; flex-shrink: 0; }
+.event-info-item .ei-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-light); }
+.event-info-item .ei-value { font-weight: 500; color: var(--charcoal); font-size: 15px; }
+
+/* Tabungan */
+.savings-hero {
+  text-align: center;
+  padding: 32px 20px;
+  background: linear-gradient(135deg, #fdf8f5 0%, #f8f0ec 100%);
+  border-radius: var(--radius);
+  margin-bottom: 24px;
+}
+.savings-hero .big-num { font-family: 'Playfair Display', serif; font-size: 52px; color: var(--gold); }
+.savings-hero .big-label { font-size: 13px; color: var(--text-light); letter-spacing: 1px; text-transform: uppercase; margin-top: 4px; }
+.savings-hero .s-target { font-size: 14px; color: var(--text-light); margin-top: 12px; }
+.savings-hero .s-target strong { color: var(--charcoal); }
+
+/* Table-style compact */
+.compact-table { width: 100%; font-size: 13px; }
+.compact-table th {
+  text-align: left;
+  padding: 8px 6px;
+  font-weight: 600;
+  color: var(--text-light);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid #f0ebe6;
+}
+.compact-table td {
+  padding: 8px 6px;
+  border-bottom: 1px solid #f0ebe6;
+  vertical-align: middle;
+}
+.compact-table tr:last-child td { border-bottom: none; }
+
+/* Floating export */
+.floating-export {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 500;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: var(--gold);
+  color: white;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(201,169,110,0.35);
+  transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.floating-export:hover { transform: scale(1.08); background: var(--gold-dark); }
+.floating-export .tooltip {
+  position: absolute;
+  right: 60px;
+  background: var(--charcoal);
+  color: white;
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: 12px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s;
+}
+.floating-export:hover .tooltip { opacity: 1; }
+
+/* Footer */
+footer {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--text-light);
+  font-size: 13px;
+  position: relative;
+  z-index: 1;
+}
+footer .heart { color: var(--gold); }
+
+/* Empty */
+.empty-state { text-align: center; padding: 30px 20px; color: var(--text-light); }
+.empty-state .icon { font-size: 40px; margin-bottom: 10px; opacity: 0.4; }
+.empty-state p { font-size: 13px; }
+
+/* Fade */
+.fade-in { opacity: 0; transform: translateY(20px); transition: all 0.6s ease; }
+.fade-in.visible { opacity: 1; transform: translateY(0); }
+
+/* Modal */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.3);
+  backdrop-filter: blur(4px);
+  z-index: 2000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.modal-overlay.active { display: flex; }
+.modal {
+  background: var(--white);
+  border-radius: var(--radius);
+  padding: 36px;
+  width: 100%;
+  max-width: 520px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+  animation: modalIn 0.3s ease;
+}
+@keyframes modalIn { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+.modal h3 { margin-bottom: 20px; }
+
+/* Mobile nav */
+@media (max-width: 860px) {
+  .hamburger { display: flex; }
+  .nav-links {
+    position: fixed;
+    top: 60px; left: 0; right: 0;
+    background: rgba(253,248,245,0.98);
+    backdrop-filter: blur(20px);
+    flex-direction: column;
+    padding: 16px 20px 24px;
+    gap: 4px;
+    display: none;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+    border-radius: 0 0 var(--radius) var(--radius);
+  }
+  .nav-links.open { display: flex; }
+  .nav-links a { padding: 10px 14px; font-size: 13px; }
+  .dropdown-content { position: static; transform: none; box-shadow: none; padding: 0 0 0 14px; }
+  .dropdown-content a { font-size: 12px; padding: 6px 14px; }
+  .nav-links .nav-btn { text-align: center; }
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--cream); }
+::-webkit-scrollbar-thumb { background: #d4ccc6; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #b8b0a8; }
+</style>
+</head>
+<body>
+
+<div class="floral-bg">
+  <span></span><span></span><span></span><span></span>
+</div>
+
+<nav id="navbar">
+  <div class="nav-logo">Wedding<span>Plan</span></div>
+  <button class="hamburger" id="hamburger" onclick="toggleNav()">
+    <span></span><span></span><span></span>
+  </button>
+  <ul class="nav-links" id="navLinks">
+    <li><a href="#couple" onclick="closeNav()">Couple</a></li>
+    <li><a href="#event" onclick="closeNav()">Event</a></li>
+    <li><a href="#guests" onclick="closeNav()">Guests</a></li>
+    <li><a href="#budget" onclick="closeNav()">Budget</a></li>
+    <li class="dropdown">
+      <a href="#">Checklists &#9662;</a>
+      <div class="dropdown-content">
+        <a href="#admin" onclick="closeNav()">Admin & Dokumen</a>
+        <a href="#budget-admin" onclick="closeNav()">Budget Admin</a>
+        <a href="#vendor" onclick="closeNav()">Vendor</a>
+        <a href="#guest-check" onclick="closeNav()">Daftar Tamu</a>
+        <a href="#seserahan" onclick="closeNav()">Seserahan</a>
+        <a href="#tabungan" onclick="closeNav()">Tabungan</a>
+      </div>
+    </li>
+    <li><a href="#todo" onclick="closeNav()">To-Do</a></li>
+    <li><a href="#notes" onclick="closeNav()">Notes</a></li>
+    <li><a href="#" class="nav-btn" onclick="closeNav();exportExcel()">Export Excel</a></li>
+  </ul>
+</nav>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="hero-badge">Save the Date</div>
+  <h1>
+    <span id="heroGroom">Miswanto</span>
+    <span class="ampersand">&</span>
+    <span id="heroBride">Halimah As Sa'diyah</span>
+  </h1>
+  <p class="subtitle" id="heroTagline">We're getting married!</p>
+  <div class="hero-date">
+    <div class="date-item"><span class="num" id="heroDay">25</span><span class="lbl">Day</span></div>
+    <span class="separator">/</span>
+    <div class="date-item"><span class="num" id="heroMonth">12</span><span class="lbl">Month</span></div>
+    <span class="separator">/</span>
+    <div class="date-item"><span class="num" id="heroYear">2026</span><span class="lbl">Year</span></div>
+  </div>
+  <div class="scroll-indicator">
+    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/></svg>
+  </div>
+</section>
+
+<!-- Couple -->
+<section class="section" id="couple">
+  <div class="section-inner fade-in">
+    <div class="section-label">The Couple</div>
+    <h2 class="section-title">Bride & Groom</h2>
+    <p class="section-desc">Edit your names and let the world know who's tying the knot.</p>
+    <div class="card">
+      <div class="card-header">
+        <h3>Our Names</h3>
+        <div class="card-actions">
+          <button class="btn btn-sm btn-primary" onclick="openCoupleModal()">Edit</button>
+        </div>
+      </div>
+      <div class="couple-display">
+        <div class="couple-card">
+          <div class="initial groom">A</div>
+          <div class="name" id="displayGroom">Miswanto</div>
+          <div class="role">Groom</div>
+        </div>
+        <div class="couple-heart">&hearts;</div>
+        <div class="couple-card">
+          <div class="initial bride">S</div>
+          <div class="name" id="displayBride">Halimah As Sa'diyah</div>
+          <div class="role">Bride</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Event -->
+<section class="section" id="event">
+  <div class="section-inner fade-in">
+    <div class="section-label">The Event</div>
+    <h2 class="section-title">Wedding Details</h2>
+    <p class="section-desc">Venue, date, and everything in between.</p>
+    <div class="card">
+      <div class="card-header">
+        <h3>Event Information</h3>
+        <div class="card-actions">
+          <button class="btn btn-sm btn-primary" onclick="openEventModal()">Edit</button>
+        </div>
+      </div>
+      <div id="eventDisplay" class="event-info"></div>
+      <div id="countdownDisplay" class="countdown"></div>
+    </div>
+  </div>
+</section>
+
+<!-- Guests -->
+<section class="section" id="guests">
+  <div class="section-inner fade-in">
+    <div class="section-label">Guest List</div>
+    <h2 class="section-title">Our Guests</h2>
+    <p class="section-desc">Manage invitations and RSVPs.</p>
+    <div id="guestStats" class="stats-grid"></div>
+    <div class="card">
+      <div class="card-header">
+        <h3>Guest List</h3>
+        <button class="btn btn-sm btn-primary" onclick="openGuestModal()">+ Add Guest</button>
+      </div>
+      <div id="guestList"></div>
+    </div>
+  </div>
+</section>
+
+<!-- Budget -->
+<section class="section" id="budget">
+  <div class="section-inner fade-in">
+    <div class="section-label">Budget</div>
+    <h2 class="section-title">Wedding Budget</h2>
+    <p class="section-desc">Track your spending and stay on budget.</p>
+    <div id="budgetStats" class="stats-grid"></div>
+    <div class="card">
+      <div class="card-header">
+        <h3>Budget Items</h3>
+        <button class="btn btn-sm btn-primary" onclick="openBudgetModal()">+ Add Item</button>
+      </div>
+      <div id="budgetTotalBar" style="margin-bottom:16px"></div>
+      <div id="budgetList"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== CHECKLIST GRID SECTION ===== -->
+<section class="section" id="checklists">
+  <div class="section-inner fade-in">
+    <div class="section-label">Checklists</div>
+    <h2 class="section-title">Wedding Preparation</h2>
+    <p class="section-desc">Stay on top of every detail with these powerful checklists.</p>
+
+    <div class="checklist-grid">
+
+      <!-- Admin & Dokumen -->
+      <div class="mini-card" id="admin">
+        <div class="mc-header">
+          <h4><span class="mc-icon">&#128196;</span> Admin & Dokumen</h4>
+          <div class="card-actions">
+            <button class="btn btn-sm btn-primary" onclick="openAdminModal()">+</button>
+          </div>
+        </div>
+        <div id="adminProgress" class="mc-progress" style="margin-bottom:12px">
+          <span id="adminStat">0/0</span>
+          <div class="bar"><div class="fill" id="adminFill" style="width:0%"></div></div>
+        </div>
+        <div id="adminList"></div>
+      </div>
+
+      <!-- Budget Administrasi -->
+      <div class="mini-card" id="budget-admin">
+        <div class="mc-header">
+          <h4><span class="mc-icon">&#128202;</span> Budget Admin</h4>
+          <div class="card-actions">
+            <button class="btn btn-sm btn-primary" onclick="openBudgetAdminModal()">+</button>
+          </div>
+        </div>
+        <div id="budgetAdminProgress" class="mc-progress" style="margin-bottom:12px">
+          <span id="budgetAdminStat">0/0</span>
+          <div class="bar"><div class="fill" id="budgetAdminFill" style="width:0%"></div></div>
+        </div>
+        <div id="budgetAdminList"></div>
+      </div>
+
+      <!-- Vendor Ceklis -->
+      <div class="mini-card" id="vendor">
+        <div class="mc-header">
+          <h4><span class="mc-icon">&#128188;</span> Vendor Ceklis</h4>
+          <div class="card-actions">
+            <button class="btn btn-sm btn-primary" onclick="openVendorModal()">+</button>
+          </div>
+        </div>
+        <div id="vendorProgress" class="mc-progress" style="margin-bottom:12px">
+          <span id="vendorStat">0 booked</span>
+          <div class="bar"><div class="fill" id="vendorFill" style="width:0%"></div></div>
+        </div>
+        <div id="vendorList"></div>
+      </div>
+
+      <!-- Daftar Tamu Ceklis -->
+      <div class="mini-card" id="guest-check">
+        <div class="mc-header">
+          <h4><span class="mc-icon">&#128101;</span> Daftar Tamu</h4>
+          <div class="card-actions">
+            <button class="btn btn-sm btn-primary" onclick="openGuestCheckModal()">+</button>
+          </div>
+        </div>
+        <div id="guestCheckProgress" class="mc-progress" style="margin-bottom:12px">
+          <span id="guestCheckStat">0/0</span>
+          <div class="bar"><div class="fill" id="guestCheckFill" style="width:0%"></div></div>
+        </div>
+        <div id="guestCheckList"></div>
+      </div>
+
+      <!-- Seserahan -->
+      <div class="mini-card" id="seserahan">
+        <div class="mc-header">
+          <h4><span class="mc-icon">&#127873;</span> Seserahan</h4>
+          <div class="card-actions">
+            <button class="btn btn-sm btn-primary" onclick="openSeserahanModal()">+</button>
+          </div>
+        </div>
+        <div id="seserahanProgress" class="mc-progress" style="margin-bottom:12px">
+          <span id="seserahanStat">0/0</span>
+          <div class="bar"><div class="fill" id="seserahanFill" style="width:0%"></div></div>
+        </div>
+        <div id="seserahanList"></div>
+      </div>
+
+      <!-- Tabungan -->
+      <div class="mini-card" id="tabungan">
+        <div class="mc-header">
+          <h4><span class="mc-icon">&#128179;</span> Tabungan</h4>
+          <div class="card-actions">
+            <button class="btn btn-sm btn-primary" onclick="openTabunganModal()">Set Target</button>
+            <button class="btn btn-sm btn-secondary" onclick="openTabunganAddModal()">+ Add</button>
+          </div>
+        </div>
+        <div id="tabunganContent"></div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- To-Do -->
+<section class="section" id="todo">
+  <div class="section-inner fade-in">
+    <div class="section-label">Checklist</div>
+    <h2 class="section-title">To-Do List</h2>
+    <p class="section-desc">Stay organized with your wedding tasks.</p>
+    <div id="todoStats" class="stats-grid"></div>
+    <div class="card">
+      <div class="card-header">
+        <h3>Tasks</h3>
+        <button class="btn btn-sm btn-primary" onclick="openTodoModal()">+ Add Task</button>
+      </div>
+      <div id="todoList"></div>
+    </div>
+  </div>
+</section>
+
+<!-- Notes -->
+<section class="section" id="notes">
+  <div class="section-inner fade-in">
+    <div class="section-label">Notes</div>
+    <h2 class="section-title">Wedding Notes</h2>
+    <p class="section-desc">Jot down your ideas and reminders.</p>
+    <div class="card">
+      <div class="card-header">
+        <h3>Notes</h3>
+        <button class="btn btn-sm btn-primary" onclick="openNoteModal()">+ Add Note</button>
+      </div>
+      <div id="notesList" class="notes-grid"></div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  Made with <span class="heart">&hearts;</span> for the big day &mdash; Wedding Plan
+  <br><br>
+  <button class="btn btn-sm btn-gold-outline" onclick="exportExcel()">&#128229; Export All to Excel</button>
+</footer>
+
+<div class="toast" id="toast"></div>
+<button class="floating-export" onclick="exportExcel()" title="Export to Excel">
+  &#128229;
+  <span class="tooltip">Export Excel</span>
+</button>
+
+<!-- ===== MODALS ===== -->
+
+<!-- Couple -->
+<div class="modal-overlay" id="coupleModal">
+  <div class="modal">
+    <h3>Edit Couple Names</h3>
+    <div class="form-group">
+      <label>Groom's Name</label>
+      <input type="text" id="inputGroom" placeholder="Miswanto" />
+    </div>
+    <div class="form-group">
+      <label>Bride's Name</label>
+      <input type="text" id="inputBride" placeholder="Halimah As Sa'diyah" />
+    </div>
+    <div class="form-group">
+      <label>Tagline</label>
+      <input type="text" id="inputTagline" placeholder="We're getting married!" />
+    </div>
+    <div style="display:flex;gap:12px;margin-top:24px">
+      <button class="btn btn-primary" onclick="saveCouple()">Save</button>
+      <button class="btn btn-secondary" onclick="closeModal('coupleModal')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- Event -->
+<div class="modal-overlay" id="eventModal">
+  <div class="modal">
+    <h3>Edit Event Details</h3>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Date</label>
+        <input type="date" id="inputDate" />
+      </div>
+      <div class="form-group">
+        <label>Time</label>
+        <input type="time" id="inputTime" />
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Venue Name</label>
+      <input type="text" id="inputVenue" placeholder="Grand Ballroom" />
+    </div>
+    <div class="form-group">
+      <label>Address</label>
+      <input type="text" id="inputAddress" placeholder="123 Wedding St." />
+    </div>
+    <div class="form-group">
+      <label>City</label>
+      <input type="text" id="inputCity" placeholder="Jakarta" />
+    </div>
+    <div class="form-group">
+      <label>Theme / Color Palette</label>
+      <input type="text" id="inputTheme" placeholder="Blush & Gold" />
+    </div>
+    <div style="display:flex;gap:12px;margin-top:24px">
+      <button class="btn btn-primary" onclick="saveEvent()">Save</button>
+      <button class="btn btn-secondary" onclick="closeModal('eventModal')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- Guest (existing) -->
+<div class="modal-overlay" id="guestModal">
+  <div class="modal">
+    <h3 id="guestModalTitle">Add Guest</h3>
+    <input type="hidden" id="guestEditId" value="" />
+    <div class="form-group">
+      <label>Name</label>
+      <input type="text" id="inputGuestName" placeholder="Full name" />
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Category</label>
+        <select id="inputGuestCategory">
+          <option value="Family">Family</option>
+          <option value="Friend">Friend</option>
+          <option value="Colleague">Colleague</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>RSVP Status</label>
+        <select id="inputGuestRsvp">
+          <option value="Pending">Pending</option>
+          <option value="Confirmed">Confirmed</option>
+          <option value="Declined">Declined</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Notes (optional)</label>
+      <input type="text" id="inputGuestNotes" placeholder="Dietary restrictions, etc." />
+    </div>
+    <div style="display:flex;gap:12px;margin-top:24px">
+      <button class="btn btn-primary" onclick="saveGuest()">Save</button>
+      <button class="btn btn-secondary" onclick="closeModal('guestModal')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- Budget (existing) -->
+<div class="modal-overlay" id="budgetModal">
+  <div class="modal">
+    <h3 id="budgetModalTitle">Add Budget Item</h3>
+    <input type="hidden" id="budgetEditId" value="" />
+    <div class="form-group">
+      <label>Item Name</label>
+      <input type="text" id="inputBudgetItem" placeholder="Catering, Venue, Dress..." />
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Category</label>
+        <select id="inputBudgetCategory">
+          <option value="Venue">Venue</option>
+          <option value="Catering">Catering</option>
+          <option value="Decoration">Decoration</option>
+          <option value="Attire">Attire</option>
+          <option value="Photography">Photography</option>
+          <option value="Entertainment">Entertainment</option>
+          <option value="Transport">Transport</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Amount (Rp)</label>
+        <input type="number" id="inputBudgetAmount" placeholder="1000000" />
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Status</label>
+        <select id="inputBudgetStatus">
+          <option value="Planned">Planned</option>
+          <option value="Paid">Paid</option>
+          <option value="Pending">Pending</option>
+        </select>
+      </div>
+    </div>
+    <div style="display:flex;gap:12px;margin-top:24px">
+      <button class="btn btn-primary" onclick="saveBudget()">Save</button>
+      <button class="btn btn-secondary" onclick="closeModal('budgetModal')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- Admin & Dokumen -->
+<div class="modal-overlay" id="adminModal">
+  <div class="modal">
+    <h3 id="adminModalTitle">Add Item</h3>
+    <input type="hidden" id="adminEditId" value="" />
+    <div class="form-group">
+      <label>Item Name</label>
+      <input type="text" id="inputAdminItem" placeholder="KTP, KK, Akta Nikah..." />
+    </div>
+    <div class="form-group">
+      <label>Notes (optional)</label>
+      <input type="text" id="inputAdminNotes" placeholder="No. dokumen, status, dll" />
+    </div>
+    <div style="display:flex;gap:12px;margin-top:24px">
+      <button class="btn btn-primary" onclick="saveAdmin()">Save</button>
+      <button class="btn btn-secondary" onclick="closeModal('adminModal')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- Budget Administrasi -->
+<div class="modal-overlay" id="budgetAdminModal">
+  <div class="modal">
+    <h3 id="budgetAdminModalTitle">Add Budget Item</h3>
+    <input type="hidden" id="budgetAdminEditId" value="" />
+    <div class="form-group">
+      <label>Item Name</label>
+      <input type="text" id="inputBAItem" placeholder="Pendaftaran, Buku Nikah..." />
+    </div>
+    <div class="form-group">
+      <label>Amount (Rp)</label>
+      <input type="number" id="inputBAAmount" placeholder="500000" />
+    </div>
+    <div class="form-group">
+      <label>Notes (optional)</label>
+      <input type="text" id="inputBANotes" placeholder="" />
+    </div>
+    <div style="display:flex;gap:12px;margin-top:24px">
+      <button class="btn btn-primary" onclick="saveBudgetAdmin()">Save</button>
+      <button class="btn btn-secondary" onclick="closeModal('budgetAdminModal')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- Vendor -->
+<div class="modal-overlay" id="vendorModal">
+  <div class="modal">
+    <h3 id="vendorModalTitle">Add Vendor</h3>
+    <input type="hidden" id="vendorEditId" value="" />
+    <div class="form-group">
+      <label>Vendor Name</label>
+      <input type="text" id="inputVendorName" placeholder="Catering A, Dekorasi B..." />
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Category</label>
+        <select id="inputVendorCategory">
+          <option value="Catering">Catering</option>
+          <option value="Decoration">Decoration</option>
+          <option value="Photography">Photography</option>
+          <option value="Venue">Venue</option>
+          <option value="Fashion">Fashion</option>
+          <option value="Makeup">Makeup & Hair</option>
+          <option value="MC">MC & Entertainment</option>
+          <option value="Transport">Transport</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Status</label>
+        <select id="inputVendorStatus">
+          <option value="Not Yet">Not Yet</option>
+          <option value="Pending">Pending</option>
+          <option value="Booked">Booked</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Contact (optional)</label>
+      <input type="text" id="inputVendorContact" placeholder="Phone or email" />
+    </div>
+    <div class="form-group">
+      <label>Notes (optional)</label>
+      <input type="text" id="inputVendorNotes" placeholder="" />
+    </div>
+    <div style="display:flex;gap:12px;margin-top:24px">
+      <button class="btn btn-primary" onclick="saveVendor()">Save</button>
+      <button class="btn btn-secondary" onclick="closeModal('vendorModal')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- Guest Check (Tamu checklist) -->
+<div class="modal-overlay" id="guestCheckModal">
+  <div class="modal">
+    <h3 id="guestCheckModalTitle">Add Task</h3>
+    <input type="hidden" id="guestCheckEditId" value="" />
+    <div class="form-group">
+      <label>Task</label>
+      <input type="text" id="inputGuestCheck" placeholder="Undangan sudah dikirim..." />
+    </div>
+    <div class="form-group">
+      <label>Deadline (optional)</label>
+      <input type="date" id="inputGuestCheckDead" />
+    </div>
+    <div style="display:flex;gap:12px;margin-top:24px">
+      <button class="btn btn-primary" onclick="saveGuestCheck()">Save</button>
+      <button class="btn btn-secondary" onclick="closeModal('guestCheckModal')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- Seserahan -->
+<div class="modal-overlay" id="seserahanModal">
+  <div class="modal">
+    <h3 id="seserahanModalTitle">Add Item</h3>
+    <input type="hidden" id="seserahanEditId" value="" />
+    <div class="form-group">
+      <label>Item Name</label>
+      <input type="text" id="inputSeserahan" placeholder="Perhiasan, Pakaian, dll" />
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Quantity</label>
+        <input type="number" id="inputSeserahanQty" placeholder="1" value="1" min="1" />
+      </div>
+      <div class="form-group">
+        <label>From</label>
+        <select id="inputSeserahanFrom">
+          <option value="Pria">Pria</option>
+          <option value="Wanita">Wanita</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Notes (optional)</label>
+      <input type="text" id="inputSeserahanNotes" placeholder="" />
+    </div>
+    <div style="display:flex;gap:12px;margin-top:24px">
+      <button class="btn btn-primary" onclick="saveSeserahan()">Save</button>
+      <button class="btn btn-secondary" onclick="closeModal('seserahanModal')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- Tabungan Target -->
+<div class="modal-overlay" id="tabunganModal">
+  <div class="modal">
+    <h3>Set Target Tabungan</h3>
+    <div class="form-group">
+      <label>Target Amount (Rp)</label>
+      <input type="number" id="inputTabunganTarget" placeholder="50000000" />
+    </div>
+    <div style="display:flex;gap:12px;margin-top:24px">
+      <button class="btn btn-primary" onclick="saveTabunganTarget()">Save</button>
+      <button class="btn btn-secondary" onclick="closeModal('tabunganModal')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- Tabungan Add -->
+<div class="modal-overlay" id="tabunganAddModal">
+  <div class="modal">
+    <h3>Add Savings</h3>
+    <div class="form-group">
+      <label>Amount (Rp)</label>
+      <input type="number" id="inputTabunganAdd" placeholder="1000000" />
+    </div>
+    <div class="form-group">
+      <label>Notes (optional)</label>
+      <input type="text" id="inputTabunganNotes" placeholder="Dari gaji, bonus, dll" />
+    </div>
+    <div style="display:flex;gap:12px;margin-top:24px">
+      <button class="btn btn-primary" onclick="saveTabunganAdd()">Save</button>
+      <button class="btn btn-secondary" onclick="closeModal('tabunganAddModal')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- To-Do -->
+<div class="modal-overlay" id="todoModal">
+  <div class="modal">
+    <h3 id="todoModalTitle">Add Task</h3>
+    <input type="hidden" id="todoEditId" value="" />
+    <div class="form-group">
+      <label>Task</label>
+      <input type="text" id="inputTodo" placeholder="Book photographer..." />
+    </div>
+    <div class="form-group">
+      <label>Category</label>
+      <select id="inputTodoCategory">
+        <option value="Venue">Venue</option>
+        <option value="Vendors">Vendors</option>
+        <option value="Attire">Attire</option>
+        <option value="Decoration">Decoration</option>
+        <option value="Guests">Guests</option>
+        <option value="Ceremony">Ceremony</option>
+        <option value="Reception">Reception</option>
+        <option value="Other">Other</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Deadline (optional)</label>
+      <input type="date" id="inputTodoDeadline" />
+    </div>
+    <div style="display:flex;gap:12px;margin-top:24px">
+      <button class="btn btn-primary" onclick="saveTodo()">Save</button>
+      <button class="btn btn-secondary" onclick="closeModal('todoModal')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- Note -->
+<div class="modal-overlay" id="noteModal">
+  <div class="modal">
+    <h3 id="noteModalTitle">Add Note</h3>
+    <input type="hidden" id="noteEditId" value="" />
+    <div class="form-group">
+      <label>Your Note</label>
+      <textarea id="inputNote" placeholder="Ideas, reminders, anything..." rows="4"></textarea>
+    </div>
+    <div style="display:flex;gap:12px;margin-top:24px">
+      <button class="btn btn-primary" onclick="saveNote()">Save</button>
+      <button class="btn btn-secondary" onclick="closeModal('noteModal')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ======================== DATA ========================
+const SK = {
+  couple: 'wplan_couple',
+  event: 'wplan_event',
+  guests: 'wplan_guests',
+  budget: 'wplan_budget',
+  todos: 'wplan_todos',
+  notes: 'wplan_notes',
+  admin: 'wplan_admin',
+  budgetAdmin: 'wplan_budgetAdmin',
+  vendor: 'wplan_vendor',
+  guestCheck: 'wplan_guestCheck',
+  seserahan: 'wplan_seserahan',
+  tabungan: 'wplan_tabungan'
+};
+
+function load(key, def) {
+  try { const d = localStorage.getItem(key); return d ? JSON.parse(d) : def; } catch { return def; }
+}
+function save(key, data) { localStorage.setItem(key, JSON.stringify(data)); }
+
+const defaultCouple = { groom: 'Miswanto', bride: "Halimah As Sa'diyah", tagline: "We're getting married!" };
+const defaultEvent = {
+  date: '2026-12-25', time: '10:00',
+  venue: 'Grand Ballroom Hotel Indonesia',
+  address: 'Jl. M.H. Thamrin No.1', city: 'Jakarta',
+  theme: 'Blush Pink & Gold'
+};
+
+let coupleData = load(SK.couple, defaultCouple);
+let eventData = load(SK.event, defaultEvent);
+let guests = load(SK.guests, []);
+let budgetItems = load(SK.budget, []);
+let todos = load(SK.todos, []);
+let notes = load(SK.notes, []);
+let adminItems = load(SK.admin, []);
+let budgetAdminItems = load(SK.budgetAdmin, []);
+let vendorItems = load(SK.vendor, []);
+let guestCheckItems = load(SK.guestCheck, []);
+let seserahanItems = load(SK.seserahan, []);
+let tabunganData = load(SK.tabungan, { target: 0, history: [] });
+
+// ======================== TOAST ========================
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 2500);
+}
+
+// ======================== MODALS ========================
+function openModal(id) { document.getElementById(id).classList.add('active'); }
+function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+document.querySelectorAll('.modal-overlay').forEach(m => {
+  m.addEventListener('click', e => { if (e.target === m) m.classList.remove('active'); });
+});
+
+// ======================== NAV ========================
+function toggleNav() {
+  document.getElementById('navLinks').classList.toggle('open');
+  document.getElementById('hamburger').classList.toggle('active');
+}
+function closeNav() {
+  document.getElementById('navLinks').classList.remove('open');
+  document.getElementById('hamburger').classList.remove('active');
+}
+
+// ======================== COUPLE ========================
+function renderCouple() {
+  document.getElementById('displayGroom').textContent = coupleData.groom;
+  document.getElementById('displayBride').textContent = coupleData.bride;
+  document.getElementById('heroGroom').textContent = coupleData.groom;
+  document.getElementById('heroBride').textContent = coupleData.bride;
+  document.getElementById('heroTagline').textContent = coupleData.tagline;
+  document.querySelector('.couple-card .initial.groom').textContent = coupleData.groom.charAt(0).toUpperCase();
+  document.querySelector('.couple-card .initial.bride').textContent = coupleData.bride.charAt(0).toUpperCase();
+}
+function openCoupleModal() {
+  document.getElementById('inputGroom').value = coupleData.groom;
+  document.getElementById('inputBride').value = coupleData.bride;
+  document.getElementById('inputTagline').value = coupleData.tagline;
+  openModal('coupleModal');
+}
+function saveCouple() {
+  coupleData.groom = document.getElementById('inputGroom').value.trim() || coupleData.groom;
+  coupleData.bride = document.getElementById('inputBride').value.trim() || coupleData.bride;
+  coupleData.tagline = document.getElementById('inputTagline').value.trim() || coupleData.tagline;
+  save(SK.couple, coupleData);
+  renderCouple();
+  closeModal('coupleModal');
+  toast('Couple names saved!');
+}
+
+// ======================== EVENT ========================
+function formatDate(dStr) {
+  if (!dStr) return { day:'--', month:'--', year:'----', full:'--', parts:[] };
+  const d = new Date(dStr + 'T12:00:00');
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  return {
+    day: String(d.getDate()).padStart(2,'0'),
+    month: months[d.getMonth()] || '--',
+    year: d.getFullYear(),
+    full: d.toLocaleDateString('en-US', { weekday:'long', day:'numeric', month:'long', year:'numeric' }),
+    parts: [String(d.getDate()).padStart(2,'0'), months[d.getMonth()] || '--', d.getFullYear()]
+  };
+}
+function renderEvent() {
+  const fd = formatDate(eventData.date);
+  document.getElementById('eventDisplay').innerHTML = `
+    <div class="event-info-item"><div class="icon">&#128197;</div><div><div class="ei-label">Date</div><div class="ei-value">${fd.full}</div></div></div>
+    <div class="event-info-item"><div class="icon">&#128340;</div><div><div class="ei-label">Time</div><div class="ei-value">${eventData.time || '--:--'}</div></div></div>
+    <div class="event-info-item"><div class="icon">&#128205;</div><div><div class="ei-label">Venue</div><div class="ei-value">${esc(eventData.venue) || '--'}</div></div></div>
+    <div class="event-info-item"><div class="icon">&#127963;</div><div><div class="ei-label">Address</div><div class="ei-value">${esc(eventData.address) || '--'}, ${esc(eventData.city) || '--'}</div></div></div>
+    <div class="event-info-item"><div class="icon">&#127912;</div><div><div class="ei-label">Theme</div><div class="ei-value">${esc(eventData.theme) || '--'}</div></div></div>
+  `;
+  document.getElementById('heroDay').textContent = fd.parts[0] || '--';
+  document.getElementById('heroMonth').textContent = fd.parts[1] || '--';
+  document.getElementById('heroYear').textContent = fd.parts[2] || '----';
+  renderCountdown(eventData.date);
+}
+function renderCountdown(dateStr) {
+  const el = document.getElementById('countdownDisplay');
+  if (!dateStr) { el.innerHTML = ''; return; }
+  const target = new Date(dateStr + 'T23:59:59').getTime();
+  const now = Date.now();
+  if (target <= now) { el.innerHTML = '<p style="color:var(--gold);font-style:italic">The big day has arrived! &#127881;</p>'; return; }
+  const diff = target - now;
+  const days = Math.floor(diff / (1000*60*60*24));
+  const hours = Math.floor((diff % (1000*60*60*24)) / (1000*60*60));
+  const mins = Math.floor((diff % (1000*60*60)) / (1000*60));
+  el.innerHTML = `
+    <div class="countdown-item"><span class="num">${days}</span><span class="lbl">Days</span></div>
+    <div class="countdown-item"><span class="num">${hours}</span><span class="lbl">Hours</span></div>
+    <div class="countdown-item"><span class="num">${mins}</span><span class="lbl">Minutes</span></div>
+  `;
+}
+function openEventModal() {
+  document.getElementById('inputDate').value = eventData.date || '';
+  document.getElementById('inputTime').value = eventData.time || '';
+  document.getElementById('inputVenue').value = eventData.venue || '';
+  document.getElementById('inputAddress').value = eventData.address || '';
+  document.getElementById('inputCity').value = eventData.city || '';
+  document.getElementById('inputTheme').value = eventData.theme || '';
+  openModal('eventModal');
+}
+function saveEvent() {
+  eventData.date = document.getElementById('inputDate').value || eventData.date;
+  eventData.time = document.getElementById('inputTime').value || eventData.time;
+  eventData.venue = document.getElementById('inputVenue').value.trim() || eventData.venue;
+  eventData.address = document.getElementById('inputAddress').value.trim() || eventData.address;
+  eventData.city = document.getElementById('inputCity').value.trim() || eventData.city;
+  eventData.theme = document.getElementById('inputTheme').value.trim() || eventData.theme;
+  save(SK.event, eventData);
+  renderEvent();
+  closeModal('eventModal');
+  toast('Event details saved!');
+}
+
+// ======================== GUESTS (existing) ========================
+function renderGuests() {
+  const total = guests.length;
+  const confirmed = guests.filter(g => g.rsvp === 'Confirmed').length;
+  const pending = guests.filter(g => g.rsvp === 'Pending').length;
+  const declined = guests.filter(g => g.rsvp === 'Declined').length;
+  document.getElementById('guestStats').innerHTML = `
+    <div class="stat-card"><div class="num">${total}</div><div class="lbl">Total Guests</div></div>
+    <div class="stat-card"><div class="num">${confirmed}</div><div class="lbl">Confirmed</div></div>
+    <div class="stat-card"><div class="num">${pending}</div><div class="lbl">Pending</div></div>
+    <div class="stat-card"><div class="num">${declined}</div><div class="lbl">Declined</div></div>
+  `;
+  const el = document.getElementById('guestList');
+  if (!guests.length) { el.innerHTML = '<div class="empty-state"><div class="icon">&#128100;</div><p>No guests yet. Add your first guest!</p></div>'; return; }
+  el.innerHTML = guests.map((g,i) => {
+    const bc = g.rsvp === 'Confirmed' ? 'badge-sage' : g.rsvp === 'Declined' ? 'badge-blush' : 'badge-gold';
+    return `<div class="list-item">
+      <div class="info"><div class="name">${esc(g.name)}</div><div class="detail">${esc(g.category)} &middot; <span class="badge ${bc}">${g.rsvp}</span>${g.notes ? ' &middot; '+esc(g.notes) : ''}</div></div>
+      <div class="actions">
+        <button class="btn btn-xs btn-secondary" onclick="editGuest(${i})">Edit</button>
+        <button class="btn btn-xs btn-danger" onclick="deleteGuest(${i})">Del</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+function openGuestModal(id) {
+  document.getElementById('guestEditId').value = id !== undefined ? id : '';
+  document.getElementById('guestModalTitle').textContent = id !== undefined ? 'Edit Guest' : 'Add Guest';
+  if (id !== undefined) {
+    const g = guests[id];
+    document.getElementById('inputGuestName').value = g.name;
+    document.getElementById('inputGuestCategory').value = g.category;
+    document.getElementById('inputGuestRsvp').value = g.rsvp;
+    document.getElementById('inputGuestNotes').value = g.notes || '';
+  } else {
+    document.getElementById('inputGuestName').value = '';
+    document.getElementById('inputGuestCategory').value = 'Family';
+    document.getElementById('inputGuestRsvp').value = 'Pending';
+    document.getElementById('inputGuestNotes').value = '';
+  }
+  openModal('guestModal');
+}
+function editGuest(i) { openGuestModal(i); }
+function deleteGuest(i) {
+  if (!confirm('Remove this guest?')) return;
+  guests.splice(i,1); save(SK.guests, guests); renderGuests(); toast('Guest removed.');
+}
+function saveGuest() {
+  const name = document.getElementById('inputGuestName').value.trim();
+  if (!name) { toast('Please enter a name.'); return; }
+  const category = document.getElementById('inputGuestCategory').value;
+  const rsvp = document.getElementById('inputGuestRsvp').value;
+  const notes = document.getElementById('inputGuestNotes').value.trim();
+  const editId = document.getElementById('guestEditId').value;
+  const obj = { name, category, rsvp, notes };
+  if (editId !== '') { guests[parseInt(editId)] = obj; } else { guests.push(obj); }
+  save(SK.guests, guests); renderGuests(); closeModal('guestModal');
+  toast(editId !== '' ? 'Guest updated!' : 'Guest added!');
+}
+
+// ======================== BUDGET (existing) ========================
+function renderBudget() {
+  const total = budgetItems.reduce((s,i) => s + (Number(i.amount)||0), 0);
+  const paid = budgetItems.filter(i => i.status === 'Paid').reduce((s,i) => s + (Number(i.amount)||0), 0);
+  const planned = budgetItems.filter(i => i.status === 'Planned').reduce((s,i) => s + (Number(i.amount)||0), 0);
+  const pending = budgetItems.filter(i => i.status === 'Pending').reduce((s,i) => s + (Number(i.amount)||0), 0);
+  const fmt = (n) => 'Rp ' + Number(n).toLocaleString('id-ID');
+  document.getElementById('budgetStats').innerHTML = `
+    <div class="stat-card"><div class="num">${budgetItems.length}</div><div class="lbl">Total Items</div></div>
+    <div class="stat-card"><div class="num" style="font-size:18px">${fmt(total)}</div><div class="lbl">Total Budget</div></div>
+    <div class="stat-card"><div class="num" style="font-size:18px;color:var(--sage-dark)">${fmt(paid)}</div><div class="lbl">Paid</div></div>
+    <div class="stat-card"><div class="num" style="font-size:18px;color:var(--gold-dark)">${fmt(planned + pending)}</div><div class="lbl">Remaining</div></div>`;
+  const pct = total > 0 ? Math.round((paid / total) * 100) : 0;
+  document.getElementById('budgetTotalBar').innerHTML = `
+    <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px">
+      <span>Progress</span><span>${fmt(paid)} of ${fmt(total)} (${pct}%)</span>
+    </div>
+    <div class="progress-bar"><div class="fill" style="width:${pct}%"></div></div>`;
+  const el = document.getElementById('budgetList');
+  if (!budgetItems.length) { el.innerHTML = '<div class="empty-state"><div class="icon">&#128176;</div><p>No budget items yet.</p></div>'; return; }
+  el.innerHTML = budgetItems.map((b,i) => {
+    const bc = b.status === 'Paid' ? 'badge-sage' : b.status === 'Pending' ? 'badge-gold' : 'badge-blush';
+    return `<div class="list-item">
+      <div class="info"><div class="name">${esc(b.item)} <span class="badge ${bc}" style="font-size:9px;margin-left:4px">${b.status}</span></div>
+        <div class="detail">${esc(b.category)} &middot; ${fmt(b.amount)}</div></div>
+      <div class="actions">
+        <button class="btn btn-xs btn-secondary" onclick="editBudget(${i})">Edit</button>
+        <button class="btn btn-xs btn-danger" onclick="deleteBudget(${i})">Del</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+function openBudgetModal(id) {
+  document.getElementById('budgetEditId').value = id !== undefined ? id : '';
+  document.getElementById('budgetModalTitle').textContent = id !== undefined ? 'Edit Budget Item' : 'Add Budget Item';
+  if (id !== undefined) {
+    const b = budgetItems[id];
+    document.getElementById('inputBudgetItem').value = b.item;
+    document.getElementById('inputBudgetCategory').value = b.category;
+    document.getElementById('inputBudgetAmount').value = b.amount;
+    document.getElementById('inputBudgetStatus').value = b.status;
+  } else {
+    document.getElementById('inputBudgetItem').value = '';
+    document.getElementById('inputBudgetCategory').value = 'Venue';
+    document.getElementById('inputBudgetAmount').value = '';
+    document.getElementById('inputBudgetStatus').value = 'Planned';
+  }
+  openModal('budgetModal');
+}
+function editBudget(i) { openBudgetModal(i); }
+function deleteBudget(i) { if (!confirm('Remove this budget item?')) return; budgetItems.splice(i,1); save(SK.budget, budgetItems); renderBudget(); toast('Budget item removed.'); }
+function saveBudget() {
+  const item = document.getElementById('inputBudgetItem').value.trim();
+  if (!item) { toast('Please enter an item name.'); return; }
+  const category = document.getElementById('inputBudgetCategory').value;
+  const amount = Math.max(0, Number(document.getElementById('inputBudgetAmount').value) || 0);
+  const status = document.getElementById('inputBudgetStatus').value;
+  const editId = document.getElementById('budgetEditId').value;
+  const obj = { item, category, amount, status };
+  if (editId !== '') { budgetItems[parseInt(editId)] = obj; } else { budgetItems.push(obj); }
+  save(SK.budget, budgetItems); renderBudget(); closeModal('budgetModal');
+  toast(editId !== '' ? 'Budget item updated!' : 'Budget item added!');
+}
+
+// ======================== ADMIN & DOKUMEN ========================
+function renderAdmin() {
+  const total = adminItems.length;
+  const done = adminItems.filter(i => i.done).length;
+  const pct = total > 0 ? Math.round((done/total)*100) : 0;
+  document.getElementById('adminStat').textContent = done + '/' + total;
+  document.getElementById('adminFill').style.width = pct + '%';
+  const el = document.getElementById('adminList');
+  if (!total) { el.innerHTML = '<div class="empty-state" style="padding:16px"><p>Belum ada item</p></div>'; return; }
+  el.innerHTML = adminItems.map((a,i) => `
+    <div class="check-item ${a.done?'done':''}" onclick="toggleAdmin(${i})">
+      <div class="check-box"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg></div>
+      <div class="check-label">${esc(a.item)}${a.notes ? '<span class="check-extra">— '+esc(a.notes)+'</span>' : ''}</div>
+      <button class="btn btn-xs btn-danger" onclick="event.stopPropagation();deleteAdmin(${i})">Del</button>
+    </div>
+  `).join('');
+}
+function toggleAdmin(i) { adminItems[i].done = !adminItems[i].done; save(SK.admin, adminItems); renderAdmin(); }
+function deleteAdmin(i) { adminItems.splice(i,1); save(SK.admin, adminItems); renderAdmin(); }
+function openAdminModal(id) {
+  document.getElementById('adminEditId').value = id !== undefined ? id : '';
+  document.getElementById('adminModalTitle').textContent = id !== undefined ? 'Edit Item' : 'Add Item';
+  if (id !== undefined) {
+    document.getElementById('inputAdminItem').value = adminItems[id].item;
+    document.getElementById('inputAdminNotes').value = adminItems[id].notes || '';
+  } else {
+    document.getElementById('inputAdminItem').value = '';
+    document.getElementById('inputAdminNotes').value = '';
+  }
+  openModal('adminModal');
+}
+function saveAdmin() {
+  const item = document.getElementById('inputAdminItem').value.trim();
+  if (!item) { toast('Masukkan nama item.'); return; }
+  const notes = document.getElementById('inputAdminNotes').value.trim();
+  const editId = document.getElementById('adminEditId').value;
+  const obj = { item, notes, done: false };
+  if (editId !== '') { adminItems[parseInt(editId)].item = obj.item; adminItems[parseInt(editId)].notes = obj.notes; }
+  else { adminItems.push(obj); }
+  save(SK.admin, adminItems); renderAdmin(); closeModal('adminModal');
+  toast(editId !== '' ? 'Item updated!' : 'Item added!');
+}
+
+// ======================== BUDGET ADMINISTRASI ========================
+function renderBudgetAdmin() {
+  const total = budgetAdminItems.length;
+  const done = budgetAdminItems.filter(i => i.done).length;
+  const pct = total > 0 ? Math.round((done/total)*100) : 0;
+  document.getElementById('budgetAdminStat').textContent = done + '/' + total;
+  document.getElementById('budgetAdminFill').style.width = pct + '%';
+  const fmt = (n) => 'Rp ' + Number(n).toLocaleString('id-ID');
+  const el = document.getElementById('budgetAdminList');
+  if (!total) { el.innerHTML = '<div class="empty-state" style="padding:16px"><p>Belum ada item</p></div>'; return; }
+  el.innerHTML = budgetAdminItems.map((b,i) => `
+    <div class="check-item ${b.done?'done':''}" onclick="toggleBudgetAdmin(${i})">
+      <div class="check-box"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg></div>
+      <div class="check-label">${esc(b.item)}<span class="check-extra">${fmt(b.amount)}${b.notes ? ' — '+esc(b.notes) : ''}</span></div>
+      <button class="btn btn-xs btn-danger" onclick="event.stopPropagation();deleteBudgetAdmin(${i})">Del</button>
+    </div>
+  `).join('');
+}
+function toggleBudgetAdmin(i) { budgetAdminItems[i].done = !budgetAdminItems[i].done; save(SK.budgetAdmin, budgetAdminItems); renderBudgetAdmin(); }
+function deleteBudgetAdmin(i) { budgetAdminItems.splice(i,1); save(SK.budgetAdmin, budgetAdminItems); renderBudgetAdmin(); }
+function openBudgetAdminModal(id) {
+  document.getElementById('budgetAdminEditId').value = id !== undefined ? id : '';
+  document.getElementById('budgetAdminModalTitle').textContent = id !== undefined ? 'Edit Item' : 'Add Item';
+  if (id !== undefined) {
+    document.getElementById('inputBAItem').value = budgetAdminItems[id].item;
+    document.getElementById('inputBAAmount').value = budgetAdminItems[id].amount;
+    document.getElementById('inputBANotes').value = budgetAdminItems[id].notes || '';
+  } else {
+    document.getElementById('inputBAItem').value = '';
+    document.getElementById('inputBAAmount').value = '';
+    document.getElementById('inputBANotes').value = '';
+  }
+  openModal('budgetAdminModal');
+}
+function saveBudgetAdmin() {
+  const item = document.getElementById('inputBAItem').value.trim();
+  if (!item) { toast('Masukkan nama item.'); return; }
+  const amount = Math.max(0, Number(document.getElementById('inputBAAmount').value) || 0);
+  const notes = document.getElementById('inputBANotes').value.trim();
+  const editId = document.getElementById('budgetAdminEditId').value;
+  const obj = { item, amount, notes, done: false };
+  if (editId !== '') { budgetAdminItems[parseInt(editId)].item = obj.item; budgetAdminItems[parseInt(editId)].amount = obj.amount; budgetAdminItems[parseInt(editId)].notes = obj.notes; }
+  else { budgetAdminItems.push(obj); }
+  save(SK.budgetAdmin, budgetAdminItems); renderBudgetAdmin(); closeModal('budgetAdminModal');
+  toast(editId !== '' ? 'Item updated!' : 'Item added!');
+}
+
+// ======================== VENDOR CEKLIS ========================
+function renderVendor() {
+  const total = vendorItems.length;
+  const booked = vendorItems.filter(v => v.status === 'Booked').length;
+  const pct = total > 0 ? Math.round((booked/total)*100) : 0;
+  document.getElementById('vendorStat').textContent = booked + '/' + total + ' booked';
+  document.getElementById('vendorFill').style.width = pct + '%';
+  const el = document.getElementById('vendorList');
+  if (!total) { el.innerHTML = '<div class="empty-state" style="padding:16px"><p>Belum ada vendor</p></div>'; return; }
+  el.innerHTML = vendorItems.map((v,i) => {
+    const bc = v.status === 'Booked' ? 'badge-sage' : v.status === 'Pending' ? 'badge-gold' : 'badge-rose';
+    return `<div class="list-item" style="padding:8px 0">
+      <div class="info"><div class="name" style="font-size:13px">${esc(v.name)} <span class="badge ${bc}" style="font-size:9px">${v.status}</span></div>
+        <div class="detail">${esc(v.category)}${v.contact ? ' &middot; '+esc(v.contact) : ''}${v.notes ? ' &middot; '+esc(v.notes) : ''}</div></div>
+      <div class="actions">
+        <button class="btn btn-xs btn-secondary" onclick="editVendor(${i})">Edit</button>
+        <button class="btn btn-xs btn-danger" onclick="deleteVendor(${i})">Del</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+function toggleVendorStatus(i) {
+  const sts = ['Not Yet', 'Pending', 'Booked'];
+  const cur = sts.indexOf(vendorItems[i].status);
+  vendorItems[i].status = sts[(cur + 1) % 3];
+  save(SK.vendor, vendorItems); renderVendor();
+}
+function deleteVendor(i) { vendorItems.splice(i,1); save(SK.vendor, vendorItems); renderVendor(); }
+function openVendorModal(id) {
+  document.getElementById('vendorEditId').value = id !== undefined ? id : '';
+  document.getElementById('vendorModalTitle').textContent = id !== undefined ? 'Edit Vendor' : 'Add Vendor';
+  if (id !== undefined) {
+    const v = vendorItems[id];
+    document.getElementById('inputVendorName').value = v.name;
+    document.getElementById('inputVendorCategory').value = v.category;
+    document.getElementById('inputVendorContact').value = v.contact || '';
+    document.getElementById('inputVendorStatus').value = v.status;
+    document.getElementById('inputVendorNotes').value = v.notes || '';
+  } else {
+    document.getElementById('inputVendorName').value = '';
+    document.getElementById('inputVendorCategory').value = 'Catering';
+    document.getElementById('inputVendorContact').value = '';
+    document.getElementById('inputVendorStatus').value = 'Not Yet';
+    document.getElementById('inputVendorNotes').value = '';
+  }
+  openModal('vendorModal');
+}
+function editVendor(i) { openVendorModal(i); }
+function saveVendor() {
+  const name = document.getElementById('inputVendorName').value.trim();
+  if (!name) { toast('Masukkan nama vendor.'); return; }
+  const category = document.getElementById('inputVendorCategory').value;
+  const contact = document.getElementById('inputVendorContact').value.trim();
+  const status = document.getElementById('inputVendorStatus').value;
+  const notes = document.getElementById('inputVendorNotes').value.trim();
+  const editId = document.getElementById('vendorEditId').value;
+  const obj = { name, category, contact, status, notes };
+  if (editId !== '') { vendorItems[parseInt(editId)] = obj; } else { vendorItems.push(obj); }
+  save(SK.vendor, vendorItems); renderVendor(); closeModal('vendorModal');
+  toast(editId !== '' ? 'Vendor updated!' : 'Vendor added!');
+}
+
+// ======================== DAFTAR TAMU CEKLIS ========================
+function renderGuestCheck() {
+  const total = guestCheckItems.length;
+  const done = guestCheckItems.filter(i => i.done).length;
+  const pct = total > 0 ? Math.round((done/total)*100) : 0;
+  document.getElementById('guestCheckStat').textContent = done + '/' + total;
+  document.getElementById('guestCheckFill').style.width = pct + '%';
+  const el = document.getElementById('guestCheckList');
+  if (!total) { el.innerHTML = '<div class="empty-state" style="padding:16px"><p>Belum ada task</p></div>'; return; }
+  el.innerHTML = guestCheckItems.map((g,i) => `
+    <div class="check-item ${g.done?'done':''}" onclick="toggleGuestCheck(${i})">
+      <div class="check-box"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg></div>
+      <div class="check-label">${esc(g.task)}${g.deadline ? '<span class="check-extra">deadline: '+g.deadline+'</span>' : ''}</div>
+      <button class="btn btn-xs btn-danger" onclick="event.stopPropagation();deleteGuestCheck(${i})">Del</button>
+    </div>
+  `).join('');
+}
+function toggleGuestCheck(i) { guestCheckItems[i].done = !guestCheckItems[i].done; save(SK.guestCheck, guestCheckItems); renderGuestCheck(); }
+function deleteGuestCheck(i) { guestCheckItems.splice(i,1); save(SK.guestCheck, guestCheckItems); renderGuestCheck(); }
+function openGuestCheckModal(id) {
+  document.getElementById('guestCheckEditId').value = id !== undefined ? id : '';
+  document.getElementById('guestCheckModalTitle').textContent = id !== undefined ? 'Edit Task' : 'Add Task';
+  if (id !== undefined) {
+    document.getElementById('inputGuestCheck').value = guestCheckItems[id].task;
+    document.getElementById('inputGuestCheckDead').value = guestCheckItems[id].deadline || '';
+  } else {
+    document.getElementById('inputGuestCheck').value = '';
+    document.getElementById('inputGuestCheckDead').value = '';
+  }
+  openModal('guestCheckModal');
+}
+function saveGuestCheck() {
+  const task = document.getElementById('inputGuestCheck').value.trim();
+  if (!task) { toast('Masukkan task.'); return; }
+  const deadline = document.getElementById('inputGuestCheckDead').value;
+  const editId = document.getElementById('guestCheckEditId').value;
+  const obj = { task, deadline, done: false };
+  if (editId !== '') { guestCheckItems[parseInt(editId)].task = obj.task; guestCheckItems[parseInt(editId)].deadline = obj.deadline; }
+  else { guestCheckItems.push(obj); }
+  save(SK.guestCheck, guestCheckItems); renderGuestCheck(); closeModal('guestCheckModal');
+  toast(editId !== '' ? 'Task updated!' : 'Task added!');
+}
+
+// ======================== SESERAHAN ========================
+function renderSeserahan() {
+  const total = seserahanItems.length;
+  const done = seserahanItems.filter(i => i.done).length;
+  const pct = total > 0 ? Math.round((done/total)*100) : 0;
+  document.getElementById('seserahanStat').textContent = done + '/' + total;
+  document.getElementById('seserahanFill').style.width = pct + '%';
+  const el = document.getElementById('seserahanList');
+  if (!total) { el.innerHTML = '<div class="empty-state" style="padding:16px"><p>Belum ada item</p></div>'; return; }
+  el.innerHTML = seserahanItems.map((s,i) => `
+    <div class="check-item ${s.done?'done':''}" onclick="toggleSeserahan(${i})">
+      <div class="check-box"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg></div>
+      <div class="check-label">${esc(s.item)}<span class="check-extra">${s.qty} pcs, dari ${s.from}${s.notes ? ' — '+esc(s.notes) : ''}</span></div>
+      <button class="btn btn-xs btn-danger" onclick="event.stopPropagation();deleteSeserahan(${i})">Del</button>
+    </div>
+  `).join('');
+}
+function toggleSeserahan(i) { seserahanItems[i].done = !seserahanItems[i].done; save(SK.seserahan, seserahanItems); renderSeserahan(); }
+function deleteSeserahan(i) { seserahanItems.splice(i,1); save(SK.seserahan, seserahanItems); renderSeserahan(); }
+function openSeserahanModal(id) {
+  document.getElementById('seserahanEditId').value = id !== undefined ? id : '';
+  document.getElementById('seserahanModalTitle').textContent = id !== undefined ? 'Edit Item' : 'Add Item';
+  if (id !== undefined) {
+    document.getElementById('inputSeserahan').value = seserahanItems[id].item;
+    document.getElementById('inputSeserahanQty').value = seserahanItems[id].qty;
+    document.getElementById('inputSeserahanFrom').value = seserahanItems[id].from;
+    document.getElementById('inputSeserahanNotes').value = seserahanItems[id].notes || '';
+  } else {
+    document.getElementById('inputSeserahan').value = '';
+    document.getElementById('inputSeserahanQty').value = '1';
+    document.getElementById('inputSeserahanFrom').value = 'Pria';
+    document.getElementById('inputSeserahanNotes').value = '';
+  }
+  openModal('seserahanModal');
+}
+function saveSeserahan() {
+  const item = document.getElementById('inputSeserahan').value.trim();
+  if (!item) { toast('Masukkan nama item.'); return; }
+  const qty = Math.max(1, Number(document.getElementById('inputSeserahanQty').value) || 1);
+  const from = document.getElementById('inputSeserahanFrom').value;
+  const notes = document.getElementById('inputSeserahanNotes').value.trim();
+  const editId = document.getElementById('seserahanEditId').value;
+  const obj = { item, qty, from, notes, done: false };
+  if (editId !== '') { seserahanItems[parseInt(editId)] = obj; } else { seserahanItems.push(obj); }
+  save(SK.seserahan, seserahanItems); renderSeserahan(); closeModal('seserahanModal');
+  toast(editId !== '' ? 'Item updated!' : 'Item added!');
+}
+
+// ======================== TABUNGAN ========================
+function renderTabungan() {
+  const target = Number(tabunganData.target) || 0;
+  const current = (tabunganData.history || []).reduce((s, h) => s + (Number(h.amount)||0), 0);
+  const remaining = Math.max(0, target - current);
+  const pct = target > 0 ? Math.min(100, Math.round((current/target)*100)) : 0;
+  const fmt = (n) => 'Rp ' + Number(n).toLocaleString('id-ID');
+  const el = document.getElementById('tabunganContent');
+  if (target === 0 && !tabunganData.history.length) {
+    el.innerHTML = '<div class="empty-state" style="padding:16px"><p>Atur target tabungan dulu!</p></div>';
+    return;
+  }
+  let html = '';
+  if (target > 0) {
+    html += `<div class="savings-hero" style="padding:20px">
+      <div class="big-num" style="font-size:36px">${fmt(current)}</div>
+      <div class="big-label">Terkumpul</div>
+      <div class="s-target">Target: <strong>${fmt(target)}</strong> &middot; Sisa: <strong>${fmt(remaining)}</strong></div>
+      <div class="progress-bar" style="margin-top:12px;height:8px"><div class="fill" style="width:${pct}%;height:8px"></div></div>
+      <div style="font-size:12px;color:var(--text-light);margin-top:4px">${pct}% tercapai</div>
+    </div>`;
+  }
+  if (tabunganData.history && tabunganData.history.length) {
+    html += '<table class="compact-table"><thead><tr><th>Date</th><th>Amount</th><th>Notes</th><th></th></tr></thead><tbody>';
+    tabunganData.history.slice().reverse().forEach((h, ri) => {
+      const idx = tabunganData.history.length - 1 - ri;
+      html += `<tr><td>${h.date || '—'}</td><td><strong>${fmt(h.amount)}</strong></td><td>${esc(h.notes||'')}</td>
+        <td><button class="btn btn-xs btn-danger" onclick="deleteTabungan(${idx})">Del</button></td></tr>`;
+    });
+    html += '</tbody></table>';
+  }
+  if (target === 0) {
+    html += '<div style="text-align:center;padding:12px"><button class="btn btn-sm btn-primary" onclick="openTabunganModal()">Set Target Now</button></div>';
+  }
+  el.innerHTML = html;
+}
+function deleteTabungan(i) {
+  if (!confirm('Hapus tabungan ini?')) return;
+  tabunganData.history.splice(i, 1);
+  save(SK.tabungan, tabunganData); renderTabungan();
+}
+function openTabunganModal() {
+  document.getElementById('inputTabunganTarget').value = tabunganData.target || '';
+  openModal('tabunganModal');
+}
+function saveTabunganTarget() {
+  const val = Math.max(0, Number(document.getElementById('inputTabunganTarget').value) || 0);
+  tabunganData.target = val;
+  save(SK.tabungan, tabunganData); renderTabungan(); closeModal('tabunganModal');
+  toast('Target tabungan disimpan!');
+}
+function openTabunganAddModal() {
+  document.getElementById('inputTabunganAdd').value = '';
+  document.getElementById('inputTabunganNotes').value = '';
+  openModal('tabunganAddModal');
+}
+function saveTabunganAdd() {
+  const amount = Math.max(0, Number(document.getElementById('inputTabunganAdd').value) || 0);
+  if (!amount) { toast('Masukkan jumlah.'); return; }
+  const notes = document.getElementById('inputTabunganNotes').value.trim();
+  const now = new Date().toLocaleDateString('en-US', { day:'numeric', month:'short', year:'numeric' });
+  if (!tabunganData.history) tabunganData.history = [];
+  tabunganData.history.push({ date: now, amount, notes });
+  save(SK.tabungan, tabunganData); renderTabungan(); closeModal('tabunganAddModal');
+  toast('Tabungan ditambahkan!');
+}
+
+// ======================== TODOS ========================
+function renderTodos() {
+  const total = todos.length;
+  const done = todos.filter(t => t.done).length;
+  const pct = total > 0 ? Math.round((done/total)*100) : 0;
+  document.getElementById('todoStats').innerHTML = `
+    <div class="stat-card"><div class="num">${total}</div><div class="lbl">Total Tasks</div></div>
+    <div class="stat-card"><div class="num">${done}</div><div class="lbl">Completed</div></div>
+    <div class="stat-card"><div class="num">${total - done}</div><div class="lbl">Remaining</div></div>
+    <div class="stat-card"><div class="num" style="font-size:28px">${pct}%</div><div class="lbl">Progress</div></div>`;
+  const el = document.getElementById('todoList');
+  if (!todos.length) { el.innerHTML = '<div class="empty-state"><div class="icon">&#128203;</div><p>No tasks yet. Add your first task!</p></div>'; return; }
+  el.innerHTML = todos.map((t,i) => `
+    <div class="check-item ${t.done?'done':''}" onclick="toggleTodo(${i})">
+      <div class="check-box"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg></div>
+      <div class="check-label">${esc(t.task)}${t.deadline ? '<span class="check-extra">('+t.deadline+')</span>' : ''}</div>
+      <button class="btn btn-xs btn-danger" onclick="event.stopPropagation();deleteTodo(${i})">Del</button>
+    </div>
+  `).join('');
+}
+function toggleTodo(i) { todos[i].done = !todos[i].done; save(SK.todos, todos); renderTodos(); }
+function deleteTodo(i) { if (!confirm('Remove this task?')) return; todos.splice(i,1); save(SK.todos, todos); renderTodos(); toast('Task removed.'); }
+function openTodoModal(id) {
+  document.getElementById('todoEditId').value = id !== undefined ? id : '';
+  document.getElementById('todoModalTitle').textContent = id !== undefined ? 'Edit Task' : 'Add Task';
+  if (id !== undefined) {
+    document.getElementById('inputTodo').value = todos[id].task;
+    document.getElementById('inputTodoCategory').value = todos[id].category;
+    document.getElementById('inputTodoDeadline').value = todos[id].deadline || '';
+  } else {
+    document.getElementById('inputTodo').value = '';
+    document.getElementById('inputTodoCategory').value = 'Venue';
+    document.getElementById('inputTodoDeadline').value = '';
+  }
+  openModal('todoModal');
+}
+function saveTodo() {
+  const task = document.getElementById('inputTodo').value.trim();
+  if (!task) { toast('Please enter a task.'); return; }
+  const category = document.getElementById('inputTodoCategory').value;
+  const deadline = document.getElementById('inputTodoDeadline').value;
+  const editId = document.getElementById('todoEditId').value;
+  if (editId !== '') {
+    todos[parseInt(editId)].task = task;
+    todos[parseInt(editId)].category = category;
+    todos[parseInt(editId)].deadline = deadline;
+  } else {
+    todos.push({ task, category, deadline, done: false });
+  }
+  save(SK.todos, todos); renderTodos(); closeModal('todoModal');
+  toast(editId !== '' ? 'Task updated!' : 'Task added!');
+}
+
+// ======================== NOTES ========================
+function renderNotes() {
+  const el = document.getElementById('notesList');
+  if (!notes.length) { el.innerHTML = '<div class="empty-state"><div class="icon">&#128221;</div><p>No notes yet.</p></div>'; return; }
+  el.innerHTML = notes.map((n,i) => `
+    <div class="note-card">
+      <button class="del" onclick="deleteNote(${i})">&times;</button>
+      <p>${esc(n.text)}</p>
+      <div class="date">${n.date || ''}</div>
+    </div>
+  `).join('');
+}
+function deleteNote(i) { if (!confirm('Delete this note?')) return; notes.splice(i,1); save(SK.notes, notes); renderNotes(); toast('Note deleted.'); }
+function openNoteModal(id) {
+  document.getElementById('noteEditId').value = id !== undefined ? id : '';
+  document.getElementById('noteModalTitle').textContent = id !== undefined ? 'Edit Note' : 'Add Note';
+  document.getElementById('inputNote').value = id !== undefined ? notes[id].text : '';
+  openModal('noteModal');
+}
+function saveNote() {
+  const text = document.getElementById('inputNote').value.trim();
+  if (!text) { toast('Please write something.'); return; }
+  const editId = document.getElementById('noteEditId').value;
+  const now = new Date().toLocaleDateString('en-US', { day:'numeric', month:'short', year:'numeric' });
+  if (editId !== '') { notes[parseInt(editId)].text = text; notes[parseInt(editId)].date = now; }
+  else { notes.push({ text, date: now }); }
+  save(SK.notes, notes); renderNotes(); closeModal('noteModal');
+  toast(editId !== '' ? 'Note updated!' : 'Note added!');
+}
+
+// ======================== EXPORT EXCEL ========================
+// ======================== EXPORT EXCEL ========================
+async function exportExcel() {
+  if (typeof ExcelJS === 'undefined') {
+    toast('Loading ExcelJS library...');
+    return;
+  }
+  const wb = new ExcelJS.Workbook();
+  wb.creator = 'Wedding Plan';
+  wb.created = new Date();
+
+  const fmtRp = (n) => 'Rp ' + Number(n).toLocaleString('id-ID');
+  const ARGB = (hex) => 'FF' + hex;
+  const C = { white: 'FFFFFFFF', cream: 'FFFDF8F5', text: 'FF5A5555', muted: 'FF8A8585', border: 'FFE8E0D8' };
+
+  const PALETTES = [
+    { name:'Rose Gold',  title:'B76E79', headerBg:'B84A5A', accent:'FFFCE8E0' },
+    { name:'Sage',       title:'5B7B5A', headerBg:'3D6B3B', accent:'FFE8F0E6' },
+    { name:'Dusty Blue', title:'6A8BA0', headerBg:'3D6A7D', accent:'FFE4EDF2' },
+    { name:'Lavender',   title:'8A7AA0', headerBg:'6A5A80', accent:'FFEEEAF2' },
+    { name:'Peach',      title:'D4956A', headerBg:'B07040', accent:'FFFDEDE4' },
+    { name:'Teal',       title:'3A8A8A', headerBg:'1A6A6A', accent:'FFE0F0F0' },
+    { name:'Blush',      title:'D47A8A', headerBg:'B05060', accent:'FFFCE8EC' },
+    { name:'Warm Gold',  title:'B8953A', headerBg:'907020', accent:'FFF8F0D8' },
+    { name:'Mauve',      title:'9A6A7A', headerBg:'7A4A5A', accent:'FFF0E6EA' },
+    { name:'Sky',        title:'5A8AAA', headerBg:'3A6A8A', accent:'FFE4EEF6' },
+    { name:'Coral',      title:'CC7A6A', headerBg:'A85A4A', accent:'FFFCECE8' },
+    { name:'Forest',     title:'4A7A5A', headerBg:'2A5A3A', accent:'FFE4F0E8' },
+  ];
+  let paletteIdx = 0;
+  const nextPal = () => PALETTES[paletteIdx++ % PALETTES.length];
+
+  const COL = ['A','B','C','D','E','F','G','H'];
+
+  function styleTitle(sheet, pal, hLen) {
+    sheet.mergeCells(1, 1, 1, hLen);
+    const c = sheet.getCell('A1');
+    c.value = '';
+    c.font = { bold: true, size: 15, color: { argb: C.white }, name: 'Calibri' };
+    c.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: ARGB(pal.title) } };
+    c.alignment = { horizontal: 'center', vertical: 'middle' };
+  }
+
+  function setBorder(cell, colorHex, style) {
+    style = style || 'thin';
+    const clr = { argb: ARGB(colorHex) };
+    cell.border = { top: { style, color: clr }, bottom: { style, color: clr }, left: { style, color: clr }, right: { style, color: clr } };
+  }
+
+  function addStyledSheet(name, title, headers, data, colWidths, opts) {
+    opts = opts || {};
+    const pal = nextPal();
+    const sheet = wb.addWorksheet(name, { properties: { tabColor: { argb: ARGB(pal.title) } } });
+
+    // Column widths
+    (colWidths || headers.map(() => 18)).forEach((w, i) => {
+      sheet.getColumn(i + 1).width = typeof w === 'object' ? w.wch : w;
+    });
+
+    // Row 1: Title
+    sheet.mergeCells(1, 1, 1, headers.length);
+    const tc = sheet.getCell('A1');
+    tc.value = title;
+    tc.font = { bold: true, size: 15, color: { argb: C.white }, name: 'Calibri' };
+    tc.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: ARGB(pal.title) } };
+    tc.alignment = { horizontal: 'center', vertical: 'middle' };
+
+    // Row 3: Headers
+    headers.forEach((h, i) => {
+      const cell = sheet.getCell(`${COL[i]}3`);
+      cell.value = h;
+      cell.font = { bold: true, size: 12, color: { argb: C.white }, name: 'Calibri' };
+      cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: ARGB(pal.headerBg) } };
+      cell.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true };
+      setBorder(cell, pal.title);
+    });
+
+    // Data rows
+    data.forEach((row, i) => {
+      const rn = i + 4;
+      const bg = i % 2 === 0 ? C.white : pal.accent;
+      row.forEach((val, j) => {
+        const cell = sheet.getCell(`${COL[j]}${rn}`);
+        cell.value = val;
+        cell.font = { size: 10, color: { argb: C.text }, name: 'Calibri' };
+        cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: bg } };
+        cell.alignment = {
+          horizontal: opts.numberCols && opts.numberCols.includes(j) ? 'right' : 'left',
+          vertical: 'middle', wrapText: true
+        };
+        cell.border = {
+          bottom: { style: 'thin', color: { argb: C.border } },
+          left: { style: 'thin', color: { argb: C.border } },
+          right: { style: 'thin', color: { argb: C.border } }
+        };
+      });
+    });
+
+    return sheet;
+  }
+
+  function addInfoSheet(name, pairs, colWidths) {
+    const pal = nextPal();
+    const sheet = wb.addWorksheet(name, { properties: { tabColor: { argb: ARGB(pal.title) } } });
+    (colWidths || [22, 40]).forEach((w, i) => { sheet.getColumn(i + 1).width = typeof w === 'object' ? w.wch : w; });
+
+    // Title row
+    sheet.mergeCells(1, 1, 1, 2);
+    const tc = sheet.getCell('A1');
+    tc.value = pairs[0][0];
+    tc.font = { bold: true, size: 15, color: { argb: C.white }, name: 'Calibri' };
+    tc.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: ARGB(pal.title) } };
+    tc.alignment = { horizontal: 'center', vertical: 'middle' };
+
+    for (let i = 2; i < pairs.length; i++) {
+      const rn = i + 1;
+      const [k, v] = pairs[i];
+      const isEmpty = !k && !v;
+      const isSectionHeader = k && !v && !isEmpty;
+      for (let c = 0; c < 2; c++) {
+        const cell = sheet.getCell(`${COL[c]}${rn}`);
+        if (isEmpty) continue;
+        if (isSectionHeader) {
+          cell.value = k;
+          cell.font = { bold: true, size: 12, color: { argb: C.white }, name: 'Calibri' };
+          cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: ARGB(pal.headerBg) } };
+          cell.alignment = { horizontal: 'center', vertical: 'middle' };
+          setBorder(cell, pal.title);
+        } else {
+          cell.value = c === 0 ? k : v;
+          cell.font = {
+            bold: c === 0,
+            size: 10,
+            color: { argb: C.text }, name: 'Calibri'
+          };
+          cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: i % 2 === 0 ? C.white : pal.accent } };
+          cell.alignment = { horizontal: c === 0 ? 'left' : 'left', vertical: 'middle', wrapText: true };
+          cell.border = {
+            bottom: { style: 'thin', color: { argb: C.border } },
+            left: { style: 'thin', color: { argb: C.border } },
+            right: { style: 'thin', color: { argb: C.border } }
+          };
+        }
+      }
+    }
+    return sheet;
+  }
+
+  // ===== SHEET 1: Info Couple & Event =====
+  addInfoSheet('Info Couple & Event', [
+    ['WEDDING PLAN — Informasi Pernikahan', ''],
+    ['', ''],
+    ['DATA PENGANTIN', ''],
+    ['Groom', coupleData.groom],
+    ['Bride', coupleData.bride],
+    ['Tagline', coupleData.tagline],
+    ['', ''],
+    ['DETAIL ACARA', ''],
+    ['Tanggal', eventData.date || '—'],
+    ['Waktu', eventData.time || '—'],
+    ['Venue', eventData.venue || '—'],
+    ['Alamat', eventData.address || '—'],
+    ['Kota', eventData.city || '—'],
+    ['Tema', eventData.theme || '—']
+  ], [{ wch: 24 }, { wch: 45 }]);
+
+  // ===== SHEET 2: Daftar Tamu =====
+  addStyledSheet('Daftar Tamu', 'DAFTAR TAMU',
+    ['Nama', 'Kategori', 'RSVP', 'Catatan'],
+    guests.map(g => [g.name, g.category, g.rsvp, g.notes || '']),
+    [28, 14, 14, 30]);
+
+  // ===== SHEET 3: Budget =====
+  {
+    const pal = nextPal();
+    const sheet = wb.addWorksheet('Budget', { properties: { tabColor: { argb: ARGB(pal.title) } } });
+    sheet.getColumn(1).width = 28; sheet.getColumn(2).width = 18; sheet.getColumn(3).width = 18; sheet.getColumn(4).width = 12;
+
+    const headers = ['Item', 'Kategori', 'Jumlah (Rp)', 'Status'];
+    const data = budgetItems.map(b => [b.item, b.category, b.amount, b.status]);
+
+    sheet.mergeCells(1, 1, 1, 4);
+    const tc = sheet.getCell('A1');
+    tc.value = 'ANGGARAN PERNIKAHAN';
+    tc.font = { bold: true, size: 15, color: { argb: C.white }, name: 'Calibri' };
+    tc.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: ARGB(pal.title) } };
+    tc.alignment = { horizontal: 'center', vertical: 'middle' };
+
+    headers.forEach((h, i) => {
+      const cell = sheet.getCell(`${COL[i]}3`);
+      cell.value = h;
+      cell.font = { bold: true, size: 12, color: { argb: C.white }, name: 'Calibri' };
+      cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: ARGB(pal.headerBg) } };
+      cell.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true };
+      setBorder(cell, pal.title);
+    });
+
+    data.forEach((row, i) => {
+      const rn = i + 4;
+      const bg = i % 2 === 0 ? C.white : pal.accent;
+      row.forEach((val, j) => {
+        const cell = sheet.getCell(`${COL[j]}${rn}`);
+        cell.value = val;
+        cell.font = { size: 10, color: { argb: C.text }, name: 'Calibri' };
+        cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: bg } };
+        cell.alignment = { horizontal: j === 2 ? 'right' : 'left', vertical: 'middle', wrapText: true };
+        cell.border = { bottom: { style: 'thin', color: { argb: C.border } }, left: { style: 'thin', color: { argb: C.border } }, right: { style: 'thin', color: { argb: C.border } } };
+      });
+    });
+
+    // Total row
+    const tr = data.length + 4;
+    const total = budgetItems.reduce((s, i) => s + (Number(i.amount) || 0), 0);
+    ['A','B','C','D'].forEach((l, i) => {
+      const cell = sheet.getCell(`${l}${tr}`);
+      if (i === 0) cell.value = 'TOTAL';
+      if (i === 2) cell.value = total;
+      cell.font = { bold: true, size: 11, color: { argb: C.white }, name: 'Calibri' };
+      cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: ARGB(pal.headerBg) } };
+      cell.alignment = { horizontal: i === 2 ? 'right' : (i === 0 ? 'right' : 'left'), vertical: 'middle' };
+      cell.border = { top: { style: 'medium', color: { argb: ARGB(pal.headerBg) } }, bottom: { style: 'medium', color: { argb: ARGB(pal.headerBg) } }, left: { style: 'thin', color: { argb: ARGB(pal.headerBg) } }, right: { style: 'thin', color: { argb: ARGB(pal.headerBg) } } };
+    });
+  }
+
+  // ===== SHEET 4: Admin & Dokumen =====
+  addStyledSheet('Admin & Dokumen', 'ADMIN & DOKUMEN',
+    ['Item', 'Catatan', 'Status'],
+    adminItems.map(a => [a.item, a.notes || '', a.done ? 'Selesai' : 'Belum']),
+    [30, 35, 12]);
+
+  // ===== SHEET 5: Budget Admin =====
+  addStyledSheet('Budget Admin', 'BUDGET ADMINISTRASI',
+    ['Item', 'Jumlah (Rp)', 'Catatan', 'Status'],
+    budgetAdminItems.map(b => [b.item, b.amount, b.notes || '', b.done ? 'Selesai' : 'Belum']),
+    [28, 18, 30, 12], { numberCols: [1] });
+
+  // ===== SHEET 6: Vendor Ceklis =====
+  addStyledSheet('Vendor Ceklis', 'VENDOR CEKLIS',
+    ['Nama Vendor', 'Kategori', 'Kontak', 'Status', 'Catatan'],
+    vendorItems.map(v => [v.name, v.category, v.contact || '', v.status, v.notes || '']),
+    [28, 18, 22, 12, 28]);
+
+  // ===== SHEET 7: Daftar Tamu Checklist =====
+  addStyledSheet('Daftar Tamu Checklist', 'DAFTAR TAMU — TASK',
+    ['Task', 'Deadline', 'Status'],
+    guestCheckItems.map(g => [g.task, g.deadline || '—', g.done ? 'Selesai' : 'Belum']),
+    [35, 16, 12]);
+
+  // ===== SHEET 8: Seserahan =====
+  addStyledSheet('Seserahan', 'SESERAHAN',
+    ['Item', 'Jumlah', 'Dari', 'Catatan', 'Status'],
+    seserahanItems.map(s => [s.item, s.qty, s.from, s.notes || '', s.done ? 'Selesai' : 'Belum']),
+    [28, 10, 12, 28, 12]);
+
+  // ===== SHEET 9: Tabungan =====
+  {
+    const pal = nextPal();
+    const sheet = wb.addWorksheet('Tabungan', { properties: { tabColor: { argb: ARGB(pal.title) } } });
+    sheet.getColumn(1).width = 22; sheet.getColumn(2).width = 22; sheet.getColumn(3).width = 30;
+
+    const cur = (tabunganData.history || []).reduce((s, h) => s + (Number(h.amount) || 0), 0);
+    const tgt = Number(tabunganData.target) || 0;
+    const rem = Math.max(0, tgt - cur);
+    const pct = tgt > 0 ? Math.min(100, Math.round((cur / tgt) * 100)) : 0;
+
+    // Title
+    sheet.mergeCells(1, 1, 1, 3);
+    const tc = sheet.getCell('A1');
+    tc.value = 'TABUNGAN PERNIKAHAN';
+    tc.font = { bold: true, size: 15, color: { argb: C.white }, name: 'Calibri' };
+    tc.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: ARGB(pal.title) } };
+    tc.alignment = { horizontal: 'center', vertical: 'middle' };
+
+    // Section: Ringkasan
+    sheet.mergeCells(3, 1, 3, 3);
+    const rh = sheet.getCell('A3');
+    rh.value = 'RINGKASAN';
+    rh.font = { bold: true, size: 12, color: { argb: C.white }, name: 'Calibri' };
+    rh.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: ARGB(pal.headerBg) } };
+    rh.alignment = { horizontal: 'center', vertical: 'middle' };
+    setBorder(rh, pal.title);
+
+    const summary = [
+      ['Target', fmtRp(tgt)],
+      ['Terkumpul', fmtRp(cur)],
+      ['Sisa', fmtRp(rem)],
+      ['Progress', pct + '%']
+    ];
+    summary.forEach(([k, v], i) => {
+      const rn = i + 4;
+      const bg = i % 2 === 0 ? C.white : pal.accent;
+      const kc = sheet.getCell(`A${rn}`);
+      kc.value = k;
+      kc.font = { bold: true, size: 10, color: { argb: C.text }, name: 'Calibri' };
+      kc.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: bg } };
+      kc.alignment = { vertical: 'middle' };
+      kc.border = { bottom: { style: 'thin', color: { argb: C.border } }, left: { style: 'thin', color: { argb: C.border } }, right: { style: 'thin', color: { argb: C.border } } };
+
+      const vc = sheet.getCell(`B${rn}`);
+      vc.value = v;
+      vc.font = { bold: true, size: 11, color: { argb: ARGB(pal.title) }, name: 'Calibri' };
+      vc.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: bg } };
+      vc.alignment = { horizontal: 'right', vertical: 'middle' };
+      vc.border = { bottom: { style: 'thin', color: { argb: C.border } }, left: { style: 'thin', color: { argb: C.border } }, right: { style: 'thin', color: { argb: C.border } } };
+    });
+
+    // Section: Riwayat
+    sheet.mergeCells(9, 1, 9, 3);
+    const rh2 = sheet.getCell('A9');
+    rh2.value = 'RIWAYAT TABUNGAN';
+    rh2.font = { bold: true, size: 12, color: { argb: C.white }, name: 'Calibri' };
+    rh2.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: ARGB(pal.headerBg) } };
+    rh2.alignment = { horizontal: 'center', vertical: 'middle' };
+    setBorder(rh2, pal.title);
+
+    // Table header
+    ['Tanggal', 'Jumlah (Rp)', 'Catatan'].forEach((h, i) => {
+      const cell = sheet.getCell(`${COL[i]}10`);
+      cell.value = h;
+      cell.font = { bold: true, size: 11, color: { argb: C.white }, name: 'Calibri' };
+      cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: ARGB(pal.headerBg) } };
+      cell.alignment = { horizontal: 'center', vertical: 'middle' };
+      setBorder(cell, pal.title);
+    });
+
+    // History rows
+    (tabunganData.history || []).forEach((h, i) => {
+      const rn = i + 11;
+      const bg = i % 2 === 0 ? C.white : pal.accent;
+      const dc = sheet.getCell(`A${rn}`);
+      dc.value = h.date;
+      dc.font = { size: 10, color: { argb: C.text }, name: 'Calibri' };
+      dc.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: bg } };
+      dc.alignment = { vertical: 'middle' };
+      dc.border = { bottom: { style: 'thin', color: { argb: C.border } } };
+
+      const ac = sheet.getCell(`B${rn}`);
+      ac.value = fmtRp(h.amount);
+      ac.font = { size: 10, color: { argb: C.text }, name: 'Calibri' };
+      ac.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: bg } };
+      ac.alignment = { horizontal: 'right', vertical: 'middle' };
+      ac.border = { bottom: { style: 'thin', color: { argb: C.border } } };
+
+      const nc = sheet.getCell(`C${rn}`);
+      nc.value = h.notes || '';
+      nc.font = { size: 10, color: { argb: C.text }, name: 'Calibri' };
+      nc.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: bg } };
+      nc.alignment = { vertical: 'middle' };
+      nc.border = { bottom: { style: 'thin', color: { argb: C.border } } };
+    });
+  }
+
+  // ===== SHEET 10: To-Do List =====
+  {
+    const todosDone = todos.filter(t => t.done).length;
+    const todosTotal = todos.length;
+    const pal = nextPal();
+    const sheet = wb.addWorksheet('To-Do List', { properties: { tabColor: { argb: ARGB(pal.title) } } });
+    sheet.getColumn(1).width = 32; sheet.getColumn(2).width = 16; sheet.getColumn(3).width = 16; sheet.getColumn(4).width = 12;
+
+    sheet.mergeCells(1, 1, 1, 4);
+    const tc = sheet.getCell('A1');
+    tc.value = 'TO-DO LIST';
+    tc.font = { bold: true, size: 15, color: { argb: C.white }, name: 'Calibri' };
+    tc.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: ARGB(pal.title) } };
+    tc.alignment = { horizontal: 'center', vertical: 'middle' };
+
+    ['Task', 'Kategori', 'Deadline', 'Status'].forEach((h, i) => {
+      const cell = sheet.getCell(`${COL[i]}3`);
+      cell.value = h;
+      cell.font = { bold: true, size: 12, color: { argb: C.white }, name: 'Calibri' };
+      cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: ARGB(pal.headerBg) } };
+      cell.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true };
+      setBorder(cell, pal.title);
+    });
+
+    todos.forEach((t, i) => {
+      const rn = i + 4;
+      const bg = i % 2 === 0 ? C.white : pal.accent;
+      [t.task, t.category, t.deadline || '—', t.done ? 'Selesai' : 'Belum'].forEach((val, j) => {
+        const cell = sheet.getCell(`${COL[j]}${rn}`);
+        cell.value = val;
+        cell.font = { size: 10, color: { argb: C.text }, name: 'Calibri' };
+        cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: bg } };
+        cell.alignment = { vertical: 'middle', wrapText: true };
+        cell.border = { bottom: { style: 'thin', color: { argb: C.border } }, left: { style: 'thin', color: { argb: C.border } }, right: { style: 'thin', color: { argb: C.border } } };
+      });
+    });
+
+    // Stats
+    const sr = todos.length + 4;
+    const statsText = todosTotal > 0 ? `Completed: ${todosDone}/${todosTotal} (${Math.round(todosDone/todosTotal*100)}%)` : 'No tasks yet';
+    const sc = sheet.getCell(`A${sr}`);
+    sc.value = statsText;
+    sc.font = { italic: true, size: 10, color: { argb: C.muted }, name: 'Calibri' };
+  }
+
+  // ===== SHEET 11: Notes =====
+  addStyledSheet('Notes', 'CATATAN',
+    ['Catatan', 'Tanggal'],
+    notes.map(n => [n.text, n.date || '']),
+    [55, 16]);
+
+  // ===== SHEET 12: Ringkasan =====
+  {
+    const sumCurrent = (tabunganData.history || []).reduce((s, h) => s + (Number(h.amount) || 0), 0);
+    const sumTarget = Number(tabunganData.target) || 0;
+    addInfoSheet('Ringkasan', [
+      ['RINGKASAN WEDDING PLAN', ''],
+      ['', ''],
+      ['STATISTIK', ''],
+      ['Jumlah Tamu', guests.length + ' orang'],
+      ['Tamu Konfirmasi', guests.filter(g => g.rsvp === 'Confirmed').length + ' orang'],
+      ['Total Budget', fmtRp(budgetItems.reduce((s, i) => s + (Number(i.amount) || 0), 0))],
+      ['Budget Terbayar', fmtRp(budgetItems.filter(i => i.status === 'Paid').reduce((s, i) => s + (Number(i.amount) || 0), 0))],
+      ['Item Admin', adminItems.length + ' (' + adminItems.filter(i => i.done).length + ' selesai)'],
+      ['Item Budget Admin', budgetAdminItems.length + ' (' + budgetAdminItems.filter(i => i.done).length + ' selesai)'],
+      ['Vendor', vendorItems.length + ' (' + vendorItems.filter(v => v.status === 'Booked').length + ' booked)'],
+      ['Task Tamu', guestCheckItems.length + ' (' + guestCheckItems.filter(i => i.done).length + ' selesai)'],
+      ['Item Seserahan', seserahanItems.length + ' (' + seserahanItems.filter(i => i.done).length + ' selesai)'],
+      ['Tabungan', fmtRp(sumCurrent) + ' dari ' + fmtRp(sumTarget)],
+      ['To-Do List', todos.length + ' (' + todos.filter(t => t.done).length + ' selesai)'],
+      ['Catatan', notes.length + ' catatan']
+    ], [{ wch: 28 }, { wch: 40 }]);
+  }
+
+  // Save
+  try {
+    const buffer = await wb.xlsx.writeBuffer();
+    const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'Wedding_Plan_Data.xlsx';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    toast('Excel exported successfully! 12 sheets with beautiful styling');
+  } catch (e) {
+    toast('Error exporting: ' + e.message);
+    console.error(e);
+  }
+}
+
+// ======================== UTILITY ========================
+function esc(s) {
+  if (s == null) return '';
+  const d = document.createElement('div');
+  d.textContent = String(s);
+  return d.innerHTML;
+}
+
+// ======================== SCROLL & FADE ========================
+window.addEventListener('scroll', () => {
+  document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 60);
+});
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.1 });
+document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+
+// ======================== INIT ========================
+renderCouple();
+renderEvent();
+renderGuests();
+renderBudget();
+renderAdmin();
+renderBudgetAdmin();
+renderVendor();
+renderGuestCheck();
+renderSeserahan();
+renderTabungan();
+renderTodos();
+renderNotes();
+
+setInterval(() => renderCountdown(eventData.date), 60000);
+</script>
+</body>
+</html>
