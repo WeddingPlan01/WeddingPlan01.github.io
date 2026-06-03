@@ -603,6 +603,11 @@ footer {
   z-index: 1;
 }
 footer .heart { color: var(--gold); }
+footer .visitor-count {
+  font-size: 11px;
+  opacity: 0.6;
+  display: inline-block;
+}
 
 /* Empty */
 .empty-state { text-align: center; padding: 30px 20px; color: var(--text-light); }
@@ -944,6 +949,8 @@ footer .heart { color: var(--gold); }
   Made with <span class="heart">&hearts;</span> for the big day &mdash; Wedding Plan by <a href="https://miswant.github.io/" target="_blank">Miswanto</a>
   <br><br>
   <button class="btn btn-sm btn-gold-outline" onclick="exportExcel()">&#128229; Export All to Excel</button>
+  <br><br>
+  <span class="visitor-count">&#128065; Visitors: <span id="visitorCount">...</span></span>
 </footer>
 
 <div class="toast" id="toast"></div>
@@ -2477,6 +2484,15 @@ renderSeserahan();
 renderTabungan();
 renderTodos();
 renderNotes();
+
+// Visitor Counter
+function updateVisitorCount() {
+  fetch('https://api.countapi.xyz/hit/miswanto.github.io/weddingplan01', { cache: 'no-store' })
+    .then(r => r.json())
+    .then(d => { document.getElementById('visitorCount').textContent = d.value.toLocaleString(); })
+    .catch(() => { document.getElementById('visitorCount').textContent = '—'; });
+}
+updateVisitorCount();
 
 setInterval(() => renderCountdown(eventData.date), 60000);
 </script>
